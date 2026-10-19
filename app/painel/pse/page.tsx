@@ -1,67 +1,43 @@
 import Image from "next/image";
 import Link from "next/link";
-import { requireCardPermission } from "@/lib/auth/require-card-permission";
 
-type SpecialService = {
+type Option = {
   title: string;
   description: string;
   href: string;
-  kind: "creas" | "samca";
+  type: "system" | "data";
 };
 
-const options: SpecialService[] = [
+const options: Option[] = [
   {
-    title: "CREAS Acolher e Fortalecer",
+    title: "Acessar sistema CREAS",
     description:
-      "Atendimento especializado a famílias e pessoas em situação de risco pessoal ou social e violação de direitos.",
-    href: "https://creas-care-sync.base44.app",
-    kind: "creas",
+      "Acesse o sistema de registro e acompanhamento dos atendimentos do CREAS.",
+    href: "/rma/creas-sistema",
+    type: "system",
   },
   {
-    title: "Serviço de Acolhimento de Crianças e Adolescentes – SAMCA",
+    title: "Acessar análise RMA CREAS",
     description:
-      "Acesse o sistema do serviço de acolhimento e acompanhamento de crianças e adolescentes.",
-    href: "https://samca-gestao-cuidar.base44.app",
-    kind: "samca",
+      "Consulte a análise das informações do Registro Mensal de Atendimentos do CREAS.",
+    href: "/rma/creas",
+    type: "data",
   },
 ];
 
-function ArrowIcon({ external = false }: { external?: boolean }) {
-  if (external) {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        className="h-4 w-4 shrink-0"
-        aria-hidden="true"
-      >
-        <path
-          d="M14 4h6v6M10 14 20 4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
+function ArrowIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-4 w-4 shrink-0"
+      strokeWidth="2"
+      className="h-4 w-4"
       aria-hidden="true"
     >
+      <path d="M5 12h14" strokeLinecap="round" />
       <path
-        d="M5 12h14m-6-6 6 6-6 6"
+        d="m13 6 6 6-6 6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -69,29 +45,31 @@ function ArrowIcon({ external = false }: { external?: boolean }) {
   );
 }
 
-function ServiceIcon({ kind }: { kind: SpecialService["kind"] }) {
-  if (kind === "samca") {
-    return (
-      <svg
-        viewBox="0 0 48 48"
-        fill="none"
-        className="h-8 w-8"
-        aria-hidden="true"
-      >
-        <circle cx="18" cy="15" r="5" stroke="currentColor" strokeWidth="2" />
-        <circle cx="32" cy="18" r="4" stroke="currentColor" strokeWidth="2" />
-        <path
-          d="M7 39c.7-8 4.4-12 11-12s10.3 4 11 12m2-10c5.2 0 8.3 3.2 9 10M24 8l2-3 2 3m-2-3v6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
+function OptionIcon({ type }: { type: Option["type"] }) {
+  return type === "system" ? (
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
+      <rect
+        x="7"
+        y="9"
+        width="34"
+        height="25"
+        rx="3"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M17 40h14M24 34v6M15 17h18M15 23h11"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  ) : (
     <svg
       viewBox="0 0 48 48"
       fill="none"
@@ -99,24 +77,24 @@ function ServiceIcon({ kind }: { kind: SpecialService["kind"] }) {
       aria-hidden="true"
     >
       <path
-        d="M24 6 40 13v11c0 10-6.8 15-16 18C14.8 39 8 34 8 24V13l16-7Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M17 24h14m-7-7v14"
+        d="M8 40h33M12 36V25h7v11m5 0V17h7v19m5 0V9h7v27"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m10 18 9-6 7 2 12-8"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
 }
 
-export default async function ProtecaoSocialEspecialPage() {
-  await requireCardPermission("pse");
-
+export default function ProtecaoSocialEspecialPage() {
   return (
     <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
       <header className="border-b border-white/10 bg-[#102b27] text-white">
@@ -171,8 +149,7 @@ export default async function ProtecaoSocialEspecialPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-emerald-50/75 sm:text-base">
-            Acesse os serviços especializados de proteção e acolhimento de
-            Santa Izabel do Pará.
+            Acesse o sistema e consulte as informações do CREAS.
           </p>
 
           <div className="mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-lime-300 to-emerald-400" />
@@ -182,35 +159,33 @@ export default async function ProtecaoSocialEspecialPage() {
       <section className="mx-auto max-w-[1440px] px-5 py-9 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
         <div className="mb-7">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-800">
-            Escolha um serviço
+            Escolha uma opção
           </p>
 
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[#102b27] sm:text-3xl">
-            Serviços disponíveis
+            Acessos disponíveis
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Selecione uma opção para acessar o sistema correspondente.
+            Selecione o cartão que deseja acessar.
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {options.map((option, index) => (
-            <a
+            <Link
               key={option.href}
               href={option.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Acessar ${option.title} em uma nova aba`}
+              aria-label={option.title}
               className="group flex min-h-64 flex-col rounded-[1.5rem] border border-[#e1e3d9] bg-white p-5 shadow-[0_12px_32px_-24px_rgba(16,43,39,.4)] transition duration-200 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_22px_44px_-26px_rgba(16,90,66,.4)] focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:ring-offset-2 sm:p-6"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="grid h-14 w-14 place-items-center rounded-[1.1rem] bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-100 transition group-hover:bg-emerald-100">
-                  <ServiceIcon kind={option.kind} />
+                  <OptionIcon type={option.type} />
                 </div>
 
                 <span className="rounded-full bg-[#f3f2ed] px-3 py-1.5 text-[10px] font-black tracking-[.14em] text-slate-500">
-                  {option.kind === "creas" ? "CREAS" : "ACOLHIMENTO"} ·{" "}
+                  {option.type === "system" ? "SISTEMA" : "ANÁLISE"} ·{" "}
                   {String(index + 1).padStart(2, "0")}
                 </span>
               </div>
@@ -219,17 +194,16 @@ export default async function ProtecaoSocialEspecialPage() {
                 <h3 className="text-lg font-black leading-snug tracking-tight text-[#142e29]">
                   {option.title}
                 </h3>
-
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   {option.description}
                 </p>
               </div>
 
               <span className="mt-auto inline-flex items-center justify-between gap-3 border-t border-[#efefe9] pt-5 text-xs font-extrabold text-emerald-800 transition group-hover:text-emerald-950">
-                Acessar sistema
-                <ArrowIcon external />
+                Acessar
+                <ArrowIcon />
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -244,7 +218,6 @@ export default async function ProtecaoSocialEspecialPage() {
               Secretaria Municipal de Trabalho e Promoção Social
             </p>
           </div>
-
           <p className="text-xs text-emerald-100/65">
             Proteção Social Especial
           </p>
