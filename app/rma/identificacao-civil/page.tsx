@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 
 type Quarter = "all" | "q1" | "q2";
+
 type Month = {
   name: string;
   quarter: "q1" | "q2";
@@ -58,7 +59,7 @@ const quarterLabel = (quarter: Quarter) =>
       ? "2º trimestre (abr–jun)"
       : "1º semestre (jan–jun)";
 
-function ArrowIcon() {
+function ArrowIcon({ left = false }: { left?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -68,12 +69,22 @@ function ArrowIcon() {
       className="h-4 w-4"
       aria-hidden="true"
     >
-      <path d="M5 12h14" strokeLinecap="round" />
-      <path
-        d="m13 6 6 6-6 6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {left ? (
+        <path
+          d="M19 12H5m6 6-6-6 6-6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <>
+          <path d="M5 12h14" strokeLinecap="round" />
+          <path
+            d="m13 6 6 6-6 6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </>
+      )}
     </svg>
   );
 }
@@ -88,8 +99,8 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 className="text-lg font-extrabold tracking-tight text-slate-900">
+    <section className="rounded-2xl border border-[#e1e3d9] bg-white p-5 shadow-[0_12px_32px_-24px_rgba(16,43,39,.4)] sm:p-6">
+      <h2 className="text-lg font-extrabold tracking-tight text-[#102b27]">
         {title}
       </h2>
       {subtitle && (
@@ -116,9 +127,7 @@ function RgChart({ data }: { data: Month[] }) {
     >
       <title id="rg-chart-title">Emissões de Registro Geral por mês</title>
       <desc id="rg-chart-desc">
-        {data
-          .map((item) => `${item.name}: ${item.rg} emissões`)
-          .join("; ")}
+        {data.map((item) => `${item.name}: ${item.rg} emissões`).join("; ")}
       </desc>
 
       {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
@@ -126,13 +135,7 @@ function RgChart({ data }: { data: Month[] }) {
 
         return (
           <g key={fraction}>
-            <line
-              x1="42"
-              x2="670"
-              y1={y}
-              y2={y}
-              stroke="#e2e8f0"
-            />
+            <line x1="42" x2="670" y1={y} y2={y} stroke="#e2e8f0" />
             <text
               x="34"
               y={y + 4}
@@ -197,9 +200,9 @@ function MetricCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-[#e1e3d9] bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-black tracking-tight text-cyan-800">
+      <p className="mt-3 text-3xl font-black tracking-tight text-emerald-800">
         {value}
       </p>
       <p className="mt-2 text-xs leading-5 text-slate-500">{detail}</p>
@@ -219,11 +222,8 @@ export default function IdentificacaoCivilPage() {
   );
 
   const visibleIndexes = visibleMonths.map((month) => months.indexOf(month));
-
   const rgTotal = sum(visibleMonths.map((month) => month.rg));
-  const militaryTotal = sum(
-    visibleMonths.map((month) => month.militaryTotal),
-  );
+  const militaryTotal = sum(visibleMonths.map((month) => month.militaryTotal));
 
   const digitalTotal = digitalServices.reduce(
     (total, service) =>
@@ -239,9 +239,7 @@ export default function IdentificacaoCivilPage() {
   const overallTotal = rgTotal + militaryTotal + digitalTotal;
 
   const enlistmentTotal = sum(
-    visibleIndexes.map(
-      (index) => militaryServices[0].values[index] ?? 0,
-    ),
+    visibleIndexes.map((index) => militaryServices[0].values[index] ?? 0),
   );
 
   const elderlyCardTotal =
@@ -250,92 +248,104 @@ export default function IdentificacaoCivilPage() {
   const totalDetail =
     quarter === "q1" ? 3291 : quarter === "q2" ? 3092 : 6383;
 
+  function handleBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.assign("/");
+    }
+  }
+
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white print:hidden">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-5 lg:px-8">
+    <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
+      <header className="border-b border-white/10 bg-[#102b27] text-white print:hidden">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
           <Link
             href="/"
             aria-label="Página inicial"
-            className="flex min-w-0 items-center"
+            className="flex min-w-0 items-center gap-4"
           >
-            <div className="flex h-24 w-40 shrink-0 items-center sm:h-28 sm:w-56">
+            <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-40">
               <Image
                 src="/log.png"
                 alt="Prefeitura de Santa Izabel do Pará"
-                width={250}
-                height={140}
-                className="h-full w-full object-contain object-left"
+                width={200}
+                height={110}
+                className="h-full w-full object-contain"
                 priority
               />
             </div>
 
-            <div className="mx-6 hidden h-20 w-px bg-slate-200 md:block" />
-
-            <div className="hidden md:block">
-              <p className="text-2xl font-extrabold leading-tight tracking-tight text-slate-800">
+            <div className="hidden min-w-0 border-l border-white/20 pl-4 sm:block">
+              <p className="truncate text-xs font-semibold text-emerald-100/75">
                 Secretaria Municipal de Trabalho
-                <span className="block">
-                  e Promoção Social - SEMTEPS
+              </p>
+              <p className="truncate text-sm font-extrabold">
+                e Promoção Social{" "}
+                <span className="font-medium text-emerald-100/70">
+                  / SEMTEPS
                 </span>
               </p>
-              <p className="mt-2 text-lg text-slate-500">
+              <p className="mt-1 text-xs text-emerald-100/70">
                 Plataforma da Vigilância Socioassistencial
               </p>
             </div>
           </Link>
 
-          <nav aria-label="Navegação principal">
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
+          >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
+              className="inline-flex h-9 w-24 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
             >
               Início
               <ArrowIcon />
             </Link>
+
+            <button
+              type="button"
+              onClick={handleBack}
+              className="inline-flex h-9 w-24 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <ArrowIcon left />
+              Voltar
+            </button>
           </nav>
         </div>
 
-        <div className="border-t border-slate-100 px-6 py-4 md:hidden">
-          <p className="text-lg font-extrabold leading-tight text-slate-800">
+        <div className="border-t border-white/10 px-5 py-4 sm:hidden">
+          <p className="text-sm font-extrabold leading-tight">
             Secretaria Municipal de Trabalho
-            <span className="block">
-              e Promoção Social - SEMTEPS
-            </span>
+            <span className="block">e Promoção Social - SEMTEPS</span>
           </p>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-xs text-emerald-100/70">
             Plataforma da Vigilância Socioassistencial
           </p>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl space-y-6 px-6 py-8 lg:px-8 lg:py-10">
-        <div className="flex flex-wrap items-start justify-between gap-5">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-800">
-              Vigilância Socioassistencial
-            </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-900">
-              Análise do Setor de Identificação Civil
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-              Relatórios de Gestão do 1º trimestre (janeiro a março) e do 2º
-              trimestre (abril a junho) de 2026.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:text-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:ring-offset-2 print:hidden"
-          >
-            Imprimir / salvar PDF
-          </button>
+      <section className="bg-[#102b27] text-white">
+        <div className="mx-auto max-w-[1440px] px-5 pb-10 pt-9 sm:px-8 sm:pb-12 lg:px-12 lg:pt-12">
+          <p className="text-[10px] font-black uppercase tracking-[.22em] text-lime-300">
+            Vigilância Socioassistencial · SEMTEPS
+          </p>
+          <h1 className="mt-3 max-w-4xl text-3xl font-black leading-tight tracking-[-.035em] sm:text-4xl lg:text-5xl">
+            Análise do Setor de Identificação Civil
+          </h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-emerald-50/75 sm:text-base">
+            Relatórios de Gestão do 1º trimestre (janeiro a março) e do 2º
+            trimestre (abril a junho) de 2026.
+          </p>
+          <div className="mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-lime-300 to-emerald-400" />
         </div>
+      </section>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mx-auto max-w-[1440px] space-y-6 px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e1e3d9] bg-white p-4 shadow-sm">
           <div>
-            <span className="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold text-cyan-800">
+            <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
               Janeiro a junho de 2026
             </span>
             <p className="mt-2 text-xs text-slate-500">
@@ -347,7 +357,7 @@ export default function IdentificacaoCivilPage() {
           <div className="flex items-center gap-3 print:hidden">
             <label
               htmlFor="quarter"
-              className="text-sm font-semibold text-slate-600"
+              className="text-sm font-semibold text-slate-700"
             >
               Período
             </label>
@@ -357,7 +367,7 @@ export default function IdentificacaoCivilPage() {
               onChange={(event) =>
                 setQuarter(event.target.value as Quarter)
               }
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-700"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-700"
             >
               <option value="all">1º semestre — todos os meses</option>
               <option value="q1">1º trimestre — jan a mar</option>
@@ -366,11 +376,20 @@ export default function IdentificacaoCivilPage() {
           </div>
         </div>
 
-        <p className="text-sm text-slate-600">
-          Indicadores e gráficos: <strong>{quarterLabel(quarter)}</strong>. A
-          tabela de serviços digitais apresenta os totais trimestrais
-          disponíveis no relatório.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm text-slate-600">
+            Indicadores e gráficos: <strong>{quarterLabel(quarter)}</strong>. A
+            tabela de serviços digitais apresenta os totais trimestrais
+            disponíveis no relatório.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="rounded-lg border border-[#d5ddd4] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:ring-offset-2 print:hidden"
+          >
+            Imprimir / salvar PDF
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <MetricCard
@@ -436,38 +455,13 @@ export default function IdentificacaoCivilPage() {
                 Resumo trimestral dos atendimentos do Setor de Identificação
                 Civil
               </caption>
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[#f4f7f3] text-slate-600">
                 <tr>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-left font-semibold"
-                  >
-                    Serviço
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    1º trimestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    2º trimestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    Semestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    Variação
-                  </th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-left font-semibold">Serviço</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">1º trimestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">2º trimestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">Semestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">Variação</th>
                 </tr>
               </thead>
               <tbody>
@@ -477,25 +471,14 @@ export default function IdentificacaoCivilPage() {
                   ["Serviços digitais", 330, 437, 767, "+32,4%"],
                   ["Total", 3291, 3092, 6383, "−6,0%"],
                 ].map(([name, q1, q2, semester, variation]) => (
-                  <tr key={String(name)} className="even:bg-slate-50">
-                    <th
-                      scope="row"
-                      className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700"
-                    >
+                  <tr key={String(name)} className="even:bg-[#fafbf9]">
+                    <th scope="row" className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700">
                       {name}
                     </th>
-                    <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">
-                      {fmt(Number(q1))}
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">
-                      {fmt(Number(q2))}
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-3 text-right font-bold tabular-nums text-slate-800">
-                      {fmt(Number(semester))}
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-3 text-right font-semibold text-slate-600">
-                      {variation}
-                    </td>
+                    <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">{fmt(Number(q1))}</td>
+                    <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">{fmt(Number(q2))}</td>
+                    <td className="border-b border-slate-100 px-3 py-3 text-right font-bold tabular-nums text-slate-800">{fmt(Number(semester))}</td>
+                    <td className="border-b border-slate-100 px-3 py-3 text-right font-semibold text-slate-600">{variation}</td>
                   </tr>
                 ))}
               </tbody>
@@ -525,29 +508,15 @@ export default function IdentificacaoCivilPage() {
               <caption className="sr-only">
                 Atendimentos mensais da Junta de Serviço Militar
               </caption>
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[#f4f7f3] text-slate-600">
                 <tr>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-left font-semibold"
-                  >
-                    Serviço
-                  </th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-left font-semibold">Serviço</th>
                   {visibleMonths.map((month) => (
-                    <th
-                      key={month.name}
-                      scope="col"
-                      className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                    >
+                    <th key={month.name} scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">
                       {month.name}
                     </th>
                   ))}
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    Total
-                  </th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -560,18 +529,12 @@ export default function IdentificacaoCivilPage() {
                   );
 
                   return (
-                    <tr key={service.name} className="even:bg-slate-50">
-                      <th
-                        scope="row"
-                        className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700"
-                      >
+                    <tr key={service.name} className="even:bg-[#fafbf9]">
+                      <th scope="row" className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700">
                         {service.name}
                       </th>
                       {selectedValues.map((value, index) => (
-                        <td
-                          key={`${service.name}-${index}`}
-                          className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600"
-                        >
+                        <td key={`${service.name}-${index}`} className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">
                           {value === null ? "–" : fmt(value)}
                         </td>
                       ))}
@@ -581,21 +544,14 @@ export default function IdentificacaoCivilPage() {
                     </tr>
                   );
                 })}
-                <tr className="bg-cyan-50 font-bold text-cyan-900">
-                  <th scope="row" className="px-3 py-3 text-left">
-                    Total da Junta
-                  </th>
+                <tr className="bg-emerald-50 font-bold text-emerald-900">
+                  <th scope="row" className="px-3 py-3 text-left">Total da Junta</th>
                   {visibleMonths.map((month) => (
-                    <td
-                      key={month.name}
-                      className="px-3 py-3 text-right tabular-nums"
-                    >
+                    <td key={month.name} className="px-3 py-3 text-right tabular-nums">
                       {fmt(month.militaryTotal)}
                     </td>
                   ))}
-                  <td className="px-3 py-3 text-right tabular-nums">
-                    {fmt(militaryTotal)}
-                  </td>
+                  <td className="px-3 py-3 text-right tabular-nums">{fmt(militaryTotal)}</td>
                 </tr>
               </tbody>
             </table>
@@ -617,38 +573,13 @@ export default function IdentificacaoCivilPage() {
               <caption className="sr-only">
                 Serviços digitais por trimestre
               </caption>
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[#f4f7f3] text-slate-600">
                 <tr>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-left font-semibold"
-                  >
-                    Serviço
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    1º trimestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    2º trimestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    Semestre
-                  </th>
-                  <th
-                    scope="col"
-                    className="border-b border-slate-200 px-3 py-3 text-right font-semibold"
-                  >
-                    Variação
-                  </th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-left font-semibold">Serviço</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">1º trimestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">2º trimestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">Semestre</th>
+                  <th scope="col" className="border-b border-slate-200 px-3 py-3 text-right font-semibold">Variação</th>
                 </tr>
               </thead>
               <tbody>
@@ -667,32 +598,19 @@ export default function IdentificacaoCivilPage() {
                         )}%`;
 
                   return (
-                    <tr key={service.name} className="even:bg-slate-50">
-                      <th
-                        scope="row"
-                        className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700"
-                      >
+                    <tr key={service.name} className="even:bg-[#fafbf9]">
+                      <th scope="row" className="border-b border-slate-100 px-3 py-3 text-left font-semibold text-slate-700">
                         {service.name}
                       </th>
-                      <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">
-                        {fmt(service.q1)}
-                      </td>
-                      <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">
-                        {fmt(service.q2)}
-                      </td>
-                      <td className="border-b border-slate-100 px-3 py-3 text-right font-bold tabular-nums text-slate-800">
-                        {fmt(total)}
-                      </td>
-                      <td className="border-b border-slate-100 px-3 py-3 text-right text-slate-600">
-                        {variationText}
-                      </td>
+                      <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">{fmt(service.q1)}</td>
+                      <td className="border-b border-slate-100 px-3 py-3 text-right tabular-nums text-slate-600">{fmt(service.q2)}</td>
+                      <td className="border-b border-slate-100 px-3 py-3 text-right font-bold tabular-nums text-slate-800">{fmt(total)}</td>
+                      <td className="border-b border-slate-100 px-3 py-3 text-right text-slate-600">{variationText}</td>
                     </tr>
                   );
                 })}
-                <tr className="bg-cyan-50 font-bold text-cyan-900">
-                  <th scope="row" className="px-3 py-3 text-left">
-                    Total
-                  </th>
+                <tr className="bg-emerald-50 font-bold text-emerald-900">
+                  <th scope="row" className="px-3 py-3 text-left">Total</th>
                   <td className="px-3 py-3 text-right tabular-nums">330</td>
                   <td className="px-3 py-3 text-right tabular-nums">437</td>
                   <td className="px-3 py-3 text-right tabular-nums">767</td>
@@ -813,7 +731,7 @@ export default function IdentificacaoCivilPage() {
           </ol>
         </Panel>
 
-        <footer className="border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500">
+        <footer className="border-t border-[#dce3da] pt-5 text-xs leading-6 text-slate-500">
           <p>
             Fonte: Relatórios de Gestão do Setor de Identificação Civil do 1º e
             2º trimestres de 2026, fornecidos em HTML.

@@ -608,7 +608,7 @@ export default function RmaCrasConviverCrescerPage() {
             <Link href="/" className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]">
               Início<ArrowIcon />
             </Link>
-            <Link href="/painel/PSB" className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]">
+            <Link href="/painel/psb" className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]">
               Voltar<span className="rotate-180"><ArrowIcon /></span>
             </Link>
           </nav>

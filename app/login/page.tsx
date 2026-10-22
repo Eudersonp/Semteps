@@ -148,7 +148,7 @@ export default function LoginPage() {
           <div className="flex min-w-0 items-center gap-4">
             <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-36">
               <Image
-                src="/brasao-santa-izabel.png"
+                src="/log.png"
                 alt="Prefeitura de Santa Izabel do Pará"
                 width={200}
                 height={110}

@@ -5,13 +5,35 @@ const sistemaFinanceiroUrl = "https://conta-publica-pro.base44.app/";
 
 function ArrowIcon({ back = false }: { back?: boolean }) {
   return back ? (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden="true">
-      <path d="M19 12H5m6 6-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path
+        d="M19 12H5m6 6-6-6 6-6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   ) : (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
       <path d="M5 12h14" strokeLinecap="round" />
-      <path d="m13 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="m13 6 6 6-6 6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -50,13 +72,26 @@ export default function SetorFinanceiroPage() {
             </div>
           </Link>
 
-          <Link
-            href="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
           >
-            <ArrowIcon back />
-            Início
-          </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <ArrowIcon back />
+              Início
+            </Link>
+
+            <Link
+              href="/painel/financeiro"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <ArrowIcon back />
+              Voltar
+            </Link>
+          </nav>
         </div>
       </header>
 

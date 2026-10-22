@@ -172,26 +172,55 @@ export default function RmaCreasPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white print:hidden">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-5 lg:px-8">
-          <Link href="/" aria-label="Página inicial" className="flex min-w-0 items-center">
-            <div className="flex h-24 w-40 shrink-0 items-center sm:h-28 sm:w-56">
-              <Image src="/log.png" alt="Prefeitura de Santa Izabel do Pará" width={250} height={140} className="h-full w-full object-contain object-left" priority />
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-white/10 bg-[#102b27] text-white print:hidden">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
+          <Link href="/" aria-label="Página inicial" className="flex min-w-0 items-center gap-4">
+            <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-40">
+              <Image
+                src="/log.png"
+                alt="Prefeitura de Santa Izabel do Pará"
+                width={200}
+                height={110}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
-            <div className="mx-6 hidden h-20 w-px bg-slate-200 md:block" />
-            <div className="hidden md:block">
-              <p className="text-2xl font-extrabold leading-tight tracking-tight text-slate-800">Secretaria Municipal de Trabalho<span className="block">e Promoção Social - SEMTEPS</span></p>
-              <p className="mt-2 text-lg text-slate-500">Plataforma da Vigilância Socioassistencial</p>
+            <div className="hidden min-w-0 border-l border-white/20 pl-4 sm:block">
+              <p className="truncate text-xs font-semibold text-emerald-100/75">
+                Secretaria Municipal de Trabalho
+              </p>
+              <p className="truncate text-sm font-extrabold">
+                e Promoção Social{" "}
+                <span className="font-medium text-emerald-100/70">/ SEMTEPS</span>
+              </p>
+              <p className="mt-1 truncate text-xs text-emerald-100/70">
+                Plataforma da Vigilância Socioassistencial
+              </p>
             </div>
           </Link>
-          <nav aria-label="Navegação principal">
-            <Link href="/" className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">Início<ArrowIcon /></Link>
+
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
+          >
+            <Link
+              href="/"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              Início
+              <ArrowIcon />
+            </Link>
+            <Link
+              href="/painel/pse"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <span aria-hidden="true" className="rotate-180">
+                <ArrowIcon />
+              </span>
+              Voltar
+            </Link>
           </nav>
-        </div>
-        <div className="border-t border-slate-100 px-6 py-4 md:hidden">
-          <p className="text-lg font-extrabold leading-tight text-slate-800">Secretaria Municipal de Trabalho<span className="block">e Promoção Social - SEMTEPS</span></p>
-          <p className="mt-1 text-sm text-slate-500">Plataforma da Vigilância Socioassistencial</p>
         </div>
       </header>
 

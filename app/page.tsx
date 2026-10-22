@@ -20,7 +20,12 @@ const services: Service[] = [
     description: "CRAS, convivência e acompanhamento preventivo das famílias.",
     image: "/cras.png",
     tone: "emerald",
-    analysisLinks: [{ label: "Acessar", href: "/painel/psb" }],
+    analysisLinks: [
+      {
+        label: "Acessar",
+        href: "/painel/psb",
+      },
+    ]
   },
   {
     title: "Proteção Social Especial",
@@ -37,11 +42,11 @@ const services: Service[] = [
     image: "/trab.png",
     tone: "amber",
     analysisLinks: [
-  {
-    label: "Acessar Sala do Trabalhador",
-    href: "/painel/trabalho",
-  },
-  ],
+      {
+        label: "Acessar Sala do Trabalhador",
+        href: "/painel/trabalho",
+      },
+    ],
   },
   {
     title: "Sistema de Segurança Alimentar e Nutricional",
@@ -64,18 +69,17 @@ const services: Service[] = [
       },
     ],
   },
-  {
-    title: "Cadastro Único / Programa Bolsa Família",
-    description:
-      "Acesso às informações e aos serviços do Cadastro Único e PBF.",
-    image: "/cad.png",
-    tone: "violet",
-    analysisLinks: [
-      {
-        label: "Acessar",
-        href: "painel/cad_unico",
-        external: true,
-      },
+  
+    {
+  title: "Cadastro Único / Programa Bolsa Família",
+  description:"Acesso às informações e aos serviços do Cadastro Único e PBF.",
+  image: "/cad.png",
+  tone: "violet",
+  analysisLinks: [
+    {
+      label: "Acessar",
+      href: "/painel/cad_unico",
+    },
     ],
   },
   {
@@ -100,7 +104,7 @@ const services: Service[] = [
     analysisLinks: [
       {
         label: "Análise de atendimentos",
-        href: "/rma/identificacao_civil",
+        href: "/rma/identificacao-civil",
       },
     ],
   },
@@ -112,7 +116,7 @@ const services: Service[] = [
     analysisLinks: [
       {
         label: "Acessar dados financeiros",
-        href: "/setor-financeiro",
+        href: "/painel/financeiro",
       },
     ],
   },
@@ -309,7 +313,7 @@ export default function HomePage() {
             alt=""
             fill
             sizes="56vw"
-            className="object-cover object-center"
+            className="object-contain object-center"
             priority
           />
           <div className="absolute inset-0 bg-emerald-950/30 mix-blend-multiply" />

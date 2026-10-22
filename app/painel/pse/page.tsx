@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { requireCardPermission } from "@/lib/auth/require-card-permission";
 
 type Option = {
   title: string;
@@ -94,7 +95,9 @@ function OptionIcon({ type }: { type: Option["type"] }) {
   );
 }
 
-export default function ProtecaoSocialEspecialPage() {
+export default async function ProtecaoSocialEspecialPage() {
+  await requireCardPermission("pse");
+
   return (
     <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
       <header className="border-b border-white/10 bg-[#102b27] text-white">

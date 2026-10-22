@@ -97,7 +97,7 @@ export default function DadosDoTrabalhoPage() {
             </div>
           </Link>
           <nav aria-label="Navegação da página" className="flex shrink-0 items-center gap-2">
-            <Link href="/sala-do-trabalhador" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3.5 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27] sm:px-4">
+            <Link href="/painel/cad_unico" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3.5 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27] sm:px-4">
               <ArrowIcon back /> Voltar
             </Link>
             <Link href="/" className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27] sm:px-4">

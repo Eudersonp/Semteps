@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,11 +23,11 @@ const options: FinanceOption[] = [
     description:
       "Consulte os dados e indicadores financeiros da Secretaria Municipal de Trabalho e Promoção Social.",
     kind: "data",
-    href: "/rma/dados_financeiros",
+    href: "/rma/dados-financeiro",
   },
 ];
 
-function ArrowIcon() {
+function ArrowIcon({ left = false }: { left?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -35,11 +37,19 @@ function ArrowIcon() {
       className="h-4 w-4 shrink-0"
       aria-hidden="true"
     >
-      <path
-        d="M5 12h14m-6-6 6 6-6 6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {left ? (
+        <path
+          d="M19 12H5m6 6-6-6 6-6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          d="M5 12h14m-6-6 6 6-6 6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
     </svg>
   );
 }
@@ -139,6 +149,7 @@ function OptionCard({
         <h2 className="text-lg font-black leading-snug tracking-tight text-[#142e29]">
           {option.title}
         </h2>
+
         <p className="mt-2 text-sm leading-6 text-slate-600">
           {option.description}
         </p>
@@ -155,6 +166,14 @@ function OptionCard({
 }
 
 export default function SetorFinanceiroPage() {
+  function handleBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.assign("/");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
       <header className="border-b border-white/10 bg-[#102b27] text-white">
@@ -188,12 +207,27 @@ export default function SetorFinanceiroPage() {
             </div>
           </Link>
 
-          <Link
-            href="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
           >
-            <span aria-hidden="true">←</span> Início
-          </Link>
+            <Link
+              href="/"
+              className="inline-flex h-9 w-24 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              Início
+              <ArrowIcon />
+            </Link>
+
+            <button
+              type="button"
+              onClick={handleBack}
+              className="inline-flex h-9 w-24 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <ArrowIcon left />
+              Voltar
+            </button>
+          </nav>
         </div>
       </header>
 

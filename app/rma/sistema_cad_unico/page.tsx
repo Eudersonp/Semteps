@@ -71,13 +71,24 @@ export default function SistemaCadastroUnicoPage() {
             </div>
           </Link>
 
-          <nav aria-label="Navegação principal">
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
+          >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+              className="inline-flex h-9 w-28 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              Início
+              <ArrowIcon />
+            </Link>
+
+            <Link
+              href="/painel/cad_unico"
+              className="inline-flex h-9 w-28 items-center justify-center gap-2 rounded-full border border-white/20 px-3 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
             >
               <ArrowIcon left />
-              Início
+              Voltar
             </Link>
           </nav>
         </div>
@@ -150,11 +161,11 @@ export default function SistemaCadastroUnicoPage() {
           </div>
 
           <Link
-            href="/cadastro-unico-pbf"
+            href="/painel/cad_unico"
             className="inline-flex items-center gap-2 text-xs font-bold text-emerald-100/80 transition hover:text-lime-300 focus:outline-none focus:ring-2 focus:ring-lime-300"
           >
-            Voltar às opções
             <ArrowIcon left />
+            Voltar às opções
           </Link>
         </div>
       </footer>

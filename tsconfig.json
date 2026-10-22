@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/painel/cad_unico/page.psx", "app/painel/cad_unico/page.psx"  ],
+  ],
   "exclude": ["node_modules"]
 }

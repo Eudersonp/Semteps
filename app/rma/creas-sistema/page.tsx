@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const sistemaFinanceiroUrl = "https://creas-sistema-de-registro-de-viol-00a89639.base44.app";
+const sistemaCreasUrl =
+  "https://creas-sistema-de-registro-de-viol-00a89639.base44.app";
 
 function ArrowIcon() {
   return (
@@ -23,89 +24,104 @@ function ArrowIcon() {
   );
 }
 
-export default function SetorFinanceiroPage() {
+export default function SistemaCreasPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-5 lg:px-8">
+    <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
+      <header className="border-b border-white/10 bg-[#102b27] text-white">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
           <Link
             href="/"
-            aria-label="Página inicial"
-            className="flex min-w-0 items-center"
+            aria-label="Voltar à página inicial"
+            className="flex min-w-0 items-center gap-4"
           >
-            <div className="flex h-24 w-40 shrink-0 items-center sm:h-28 sm:w-56">
+            <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-40">
               <Image
                 src="/log.png"
                 alt="Prefeitura de Santa Izabel do Pará"
-                width={250}
-                height={140}
-                className="h-full w-full object-contain object-left"
+                width={200}
+                height={110}
+                className="h-full w-full object-contain"
                 priority
               />
             </div>
 
-            <div className="mx-6 hidden h-20 w-px bg-slate-200 md:block" />
-
-            <div className="hidden md:block">
-              <p className="text-2xl font-extrabold leading-tight tracking-tight text-slate-800">
+            <div className="hidden min-w-0 border-l border-white/20 pl-4 sm:block">
+              <p className="truncate text-xs font-semibold text-emerald-100/75">
                 Secretaria Municipal de Trabalho
-                <span className="block">e Promoção Social - SEMTEPS</span>
               </p>
-              <p className="mt-2 text-lg text-slate-500">
-                Plataforma da Vigilância Socioassistencial
+              <p className="truncate text-sm font-extrabold">
+                e Promoção Social{" "}
+                <span className="font-medium text-emerald-100/70">
+                  / SEMTEPS
+                </span>
               </p>
             </div>
           </Link>
 
-          <nav aria-label="Navegação principal">
+          <nav
+            aria-label="Navegação principal"
+            className="flex shrink-0 flex-col items-end gap-2"
+          >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
             >
               Início
               <ArrowIcon />
             </Link>
-          </nav>
-        </div>
 
-        <div className="border-t border-slate-100 px-6 py-4 md:hidden">
-          <p className="text-lg font-extrabold leading-tight text-slate-800">
-            Secretaria Municipal de Trabalho
-            <span className="block">e Promoção Social - SEMTEPS</span>
-          </p>
-          <p className="mt-1 text-sm text-slate-500">
-            Plataforma da Vigilância Socioassistencial
-          </p>
+            <Link
+              href="/painel/pse"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              <span aria-hidden="true" className="rotate-180">
+                <ArrowIcon />
+              </span>
+              Voltar
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1600px] space-y-5 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-green-700">
-            Acesso ao sistema
+      <section className="bg-[#102b27] text-white">
+        <div className="mx-auto max-w-[1440px] px-5 pb-10 pt-9 sm:px-8 sm:pb-12 lg:px-12 lg:pt-12">
+          <p className="text-[10px] font-black uppercase tracking-[.22em] text-lime-300">
+            Rede socioassistencial · SEMTEPS
           </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-900">
-           Dados e Indicadores do CREAS
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Sistema de Indicadores para o Centro de Referência Especializado de Assistência Social (CREAS)
-          </p>
-        </div>
 
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
-            <h2 className="text-lg font-extrabold text-slate-900">
+          <h1 className="mt-3 max-w-4xl text-3xl font-black leading-tight tracking-[-.035em] sm:text-4xl lg:text-5xl">
+            Dados e Indicadores do CREAS
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-emerald-50/75 sm:text-base">
+            Sistema de indicadores do Centro de Referência Especializado de
+            Assistência Social.
+          </p>
+
+          <div className="mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-lime-300 to-emerald-400" />
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-[1600px] space-y-5 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <section className="overflow-hidden rounded-xl border border-[#e1e3d9] bg-white shadow-sm">
+          <div className="border-b border-[#e1e3d9] px-5 py-4 sm:px-6">
+            <p className="text-[10px] font-black uppercase tracking-[.18em] text-emerald-800">
+              Sistema integrado
+            </p>
+
+            <h2 className="mt-1 text-lg font-extrabold text-[#102b27]">
               RMA CREAS
             </h2>
-            <p className="mt-1 text-sm leading-6 text-slate-500">
+
+            <p className="mt-1 text-sm leading-6 text-slate-600">
               O sistema está incorporado nesta página.
             </p>
           </div>
 
-          <div className="bg-slate-100 p-0 sm:p-2">
+          <div className="bg-[#f3f2ed] p-0 sm:p-2">
             <iframe
-              title="RMA CREAS"
-              src={sistemaFinanceiroUrl}
+              title="Sistema RMA CREAS"
+              src={sistemaCreasUrl}
               className="h-[78vh] min-h-[600px] w-full border-0 bg-white sm:rounded-lg lg:h-[calc(100vh-260px)] lg:min-h-[720px]"
               loading="lazy"
               allowFullScreen
@@ -114,6 +130,23 @@ export default function SetorFinanceiroPage() {
           </div>
         </section>
       </section>
+
+      <footer className="bg-[#102b27] text-white">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-2 px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+          <div>
+            <p className="text-sm font-extrabold">
+              SEMTEPS · Santa Izabel do Pará
+            </p>
+            <p className="mt-1 text-xs text-emerald-100/65">
+              Secretaria Municipal de Trabalho e Promoção Social
+            </p>
+          </div>
+
+          <p className="text-xs text-emerald-100/65">
+            Dados e Indicadores do CREAS
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
