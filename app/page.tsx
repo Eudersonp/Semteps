@@ -350,20 +350,7 @@ export default function HomePage() {
               </div>
             </Link>
 
-            <nav
-              aria-label="Navegação principal"
-              className="flex items-center gap-3"
-            >
-              <span className="hidden text-xs font-medium text-emerald-100/70 md:block">
-                Santa Izabel do Pará
-              </span>
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-bold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
-              >
-                Início <ArrowIcon />
-              </Link>
-            </nav>
+            
           </div>
         </header>
 
