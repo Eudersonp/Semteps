@@ -5,7 +5,7 @@ type Service = {
   title: string;
   description: string;
   image?: string;
-  icon?: "identification" | "council" | "map" | "planning";
+  icon?: "identification" | "council" | "map" | "planning" | "normativas";
   tone: "emerald" | "teal" | "amber" | "blue" | "violet" | "rose";
   analysisLinks: {
     label: string;
@@ -20,12 +20,7 @@ const services: Service[] = [
     description: "CRAS, convivência e acompanhamento preventivo das famílias.",
     image: "/cras.png",
     tone: "emerald",
-    analysisLinks: [
-      {
-        label: "Acessar",
-        href: "/painel/psb",
-      },
-    ],
+    analysisLinks: [{ label: "Acessar", href: "/painel/psb" }],
   },
   {
     title: "Proteção Social Especial",
@@ -55,6 +50,14 @@ const services: Service[] = [
     image: "/sisan.png",
     tone: "emerald",
     analysisLinks: [{ label: "Acessar sistema", href: "/rma/sisan" }],
+  },
+  {
+    title: "Normativas SUAS",
+    description:
+      "Consulte normas, orientações e documentos relacionados ao Sistema Único de Assistência Social.",
+    icon: "normativas",
+    tone: "violet",
+    analysisLinks: [{ label: "Acessar", href: "/normativas-suas" }],
   },
   {
     title: "Mapa Territorial",
@@ -88,12 +91,7 @@ const services: Service[] = [
       "Acesso às informações e aos serviços do Cadastro Único e PBF.",
     image: "/cad.png",
     tone: "violet",
-    analysisLinks: [
-      {
-        label: "Acessar",
-        href: "/painel/cad_unico",
-      },
-    ],
+    analysisLinks: [{ label: "Acessar", href: "/painel/cad_unico" }],
   },
   {
     title: "Conselho Tutelar",
@@ -171,10 +169,6 @@ const toneStyles: Record<
   },
 };
 
-/**
- * Encaminha os cartões para o login e guarda o destino original
- * no parâmetro "next".
- */
 function loginHref(destination: string) {
   return `/login?next=${encodeURIComponent(destination)}`;
 }
@@ -330,11 +324,37 @@ function PlanningIcon() {
   );
 }
 
+function NormativasIcon() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
+      <path
+        d="M10 4h11l7 7v21H10a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M21 4v8h7M13 18h12M13 23h12M13 28h8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function ServiceIcon({ service }: { service: Service }) {
   if (service.icon === "identification") return <IdentificationIcon />;
   if (service.icon === "council") return <CouncilIcon />;
   if (service.icon === "map") return <MapIcon />;
   if (service.icon === "planning") return <PlanningIcon />;
+  if (service.icon === "normativas") return <NormativasIcon />;
 
   if (service.image) {
     return (
@@ -361,7 +381,8 @@ export default function HomePage() {
             clipPath: "polygon(0 0, 70% 0, 100% 100%, 29% 100%)",
             WebkitMaskImage:
               "linear-gradient(to bottom, #000 68%, transparent 100%)",
-            maskImage: "linear-gradient(to bottom, #000 68%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, #000 68%, transparent 100%)",
           }}
         >
           <Image
