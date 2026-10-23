@@ -5,7 +5,7 @@ type Service = {
   title: string;
   description: string;
   image?: string;
-  icon?: "identification" | "council" | "map";
+  icon?: "identification" | "council" | "map" | "planning";
   tone: "emerald" | "teal" | "amber" | "blue" | "violet" | "rose";
   analysisLinks: {
     label: string;
@@ -25,7 +25,7 @@ const services: Service[] = [
         label: "Acessar",
         href: "/painel/psb",
       },
-    ]
+    ],
   },
   {
     title: "Proteção Social Especial",
@@ -69,17 +69,30 @@ const services: Service[] = [
       },
     ],
   },
-  
-    {
-  title: "Cadastro Único / Programa Bolsa Família",
-  description:"Acesso às informações e aos serviços do Cadastro Único e PBF.",
-  image: "/cad.png",
-  tone: "violet",
-  analysisLinks: [
-    {
-      label: "Acessar",
-      href: "/painel/cad_unico",
-    },
+  {
+    title: "Planejamento 2027",
+    description:
+      "Consulte o planejamento, as metas e as ações previstas para 2027.",
+    icon: "planning",
+    tone: "violet",
+    analysisLinks: [
+      {
+        label: "Acessar",
+        href: "/painel/planejamento-2027",
+      },
+    ],
+  },
+  {
+    title: "Cadastro Único / Programa Bolsa Família",
+    description:
+      "Acesso às informações e aos serviços do Cadastro Único e PBF.",
+    image: "/cad.png",
+    tone: "violet",
+    analysisLinks: [
+      {
+        label: "Acessar",
+        href: "/painel/cad_unico",
+      },
     ],
   },
   {
@@ -159,8 +172,8 @@ const toneStyles: Record<
 };
 
 /**
- * Encaminha todos os cartões para o login e guarda o destino
- * original em "next", tanto para rotas locais quanto externas.
+ * Encaminha os cartões para o login e guarda o destino original
+ * no parâmetro "next".
  */
 function loginHref(destination: string) {
   return `/login?next=${encodeURIComponent(destination)}`;
@@ -207,7 +220,12 @@ function ArrowIcon({ external = false }: { external?: boolean }) {
 
 function IdentificationIcon() {
   return (
-    <svg viewBox="0 0 36 36" fill="none" className="h-8 w-8" aria-hidden="true">
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
       <rect
         x="4"
         y="7"
@@ -230,7 +248,12 @@ function IdentificationIcon() {
 
 function CouncilIcon() {
   return (
-    <svg viewBox="0 0 36 36" fill="none" className="h-8 w-8" aria-hidden="true">
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
       <circle
         cx="13"
         cy="12"
@@ -257,7 +280,12 @@ function CouncilIcon() {
 
 function MapIcon() {
   return (
-    <svg viewBox="0 0 36 36" fill="none" className="h-8 w-8" aria-hidden="true">
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
       <path
         d="m4 9 9-3 10 3 9-3v21l-9 3-10-3-9 3V9Z"
         stroke="currentColor"
@@ -274,10 +302,39 @@ function MapIcon() {
   );
 }
 
+function PlanningIcon() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="7"
+        width="26"
+        height="24"
+        rx="3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M11 5v5m14-5v5M5 13h26M11 19h5m-5 5h5m4-5h5m-5 5h5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function ServiceIcon({ service }: { service: Service }) {
   if (service.icon === "identification") return <IdentificationIcon />;
   if (service.icon === "council") return <CouncilIcon />;
   if (service.icon === "map") return <MapIcon />;
+  if (service.icon === "planning") return <PlanningIcon />;
 
   if (service.image) {
     return (
@@ -304,8 +361,7 @@ export default function HomePage() {
             clipPath: "polygon(0 0, 70% 0, 100% 100%, 29% 100%)",
             WebkitMaskImage:
               "linear-gradient(to bottom, #000 68%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to bottom, #000 68%, transparent 100%)",
+            maskImage: "linear-gradient(to bottom, #000 68%, transparent 100%)",
           }}
         >
           <Image
@@ -349,8 +405,6 @@ export default function HomePage() {
                 </p>
               </div>
             </Link>
-
-            
           </div>
         </header>
 
