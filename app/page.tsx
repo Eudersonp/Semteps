@@ -15,6 +15,7 @@ type Service = {
 };
 
 const services: Service[] = [
+  // Primeira fileira: dois cartões
   {
     title: "Proteção Social Básica",
     description: "CRAS, convivência e acompanhamento preventivo das famílias.",
@@ -29,6 +30,16 @@ const services: Service[] = [
     image: "/creas.png",
     tone: "teal",
     analysisLinks: [{ label: "Acessar", href: "/painel/pse" }],
+  },
+
+  // Segunda fileira: três cartões
+  {
+    title: "Cadastro Único / Programa Bolsa Família",
+    description:
+      "Acesso às informações e aos serviços do Cadastro Único e PBF.",
+    image: "/cad.png",
+    tone: "violet",
+    analysisLinks: [{ label: "Acessar", href: "/painel/cad_unico" }],
   },
   {
     title: "Sala do Trabalhador",
@@ -51,48 +62,8 @@ const services: Service[] = [
     tone: "emerald",
     analysisLinks: [{ label: "Acessar sistema", href: "/rma/sisan" }],
   },
-  {
-    title: "Normativas SUAS",
-    description:
-      "Consulte normas, orientações e documentos relacionados ao Sistema Único de Assistência Social.",
-    icon: "normativas",
-    tone: "violet",
-    analysisLinks: [{ label: "Acessar", href: "/normativas-suas" }],
-  },
-  {
-    title: "Mapa Territorial",
-    description:
-      "Consulte a representação territorial de Santa Izabel do Pará.",
-    icon: "map",
-    tone: "blue",
-    analysisLinks: [
-      {
-        label: "Acessar mapa do município",
-        href: "/mapa-municipio",
-      },
-    ],
-  },
-  {
-    title: "Planejamento 2027",
-    description:
-      "Consulte o planejamento, as metas e as ações previstas para 2027.",
-    icon: "planning",
-    tone: "violet",
-    analysisLinks: [
-      {
-        label: "Acessar",
-        href: "/painel/planejamento-2027",
-      },
-    ],
-  },
-  {
-    title: "Cadastro Único / Programa Bolsa Família",
-    description:
-      "Acesso às informações e aos serviços do Cadastro Único e PBF.",
-    image: "/cad.png",
-    tone: "violet",
-    analysisLinks: [{ label: "Acessar", href: "/painel/cad_unico" }],
-  },
+
+  // Terceira fileira: três cartões
   {
     title: "Conselho Tutelar",
     description:
@@ -128,6 +99,47 @@ const services: Service[] = [
       {
         label: "Acessar dados financeiros",
         href: "/painel/financeiro",
+      },
+    ],
+  },
+
+  // Quarta fileira: os demais cartões
+  {
+    title: "Mapa Territorial",
+    description:
+      "Consulte a representação territorial de Santa Izabel do Pará.",
+    icon: "map",
+    tone: "blue",
+    analysisLinks: [
+      {
+        label: "Acessar mapa do município",
+        href: "/mapa-municipio",
+      },
+    ],
+  },
+  {
+    title: "Planejamento 2027",
+    description:
+      "Consulte o planejamento, as metas e as ações previstas para 2027.",
+    icon: "planning",
+    tone: "violet",
+    analysisLinks: [
+      {
+        label: "Acessar",
+        href: "/painel/planejamento-2027",
+      },
+    ],
+  },
+  {
+    title: "Normativas SUAS",
+    description:
+      "Consulte normas, orientações e documentos relacionados ao Sistema Único de Assistência Social.",
+    icon: "normativas",
+    tone: "violet",
+    analysisLinks: [
+      {
+        label: "Acessar",
+        href: "/normativas-suas",
       },
     ],
   },
