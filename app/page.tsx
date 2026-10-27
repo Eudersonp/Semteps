@@ -101,6 +101,10 @@ const services: Service[] = [
         label: "Acessar dados financeiros",
         href: "/painel/financeiro",
       },
+       {
+        label: "Consultar dados financeiros",
+        href: "/rma/dados-financeiros",
+      },
     ],
   },
 
