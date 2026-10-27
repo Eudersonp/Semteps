@@ -23,7 +23,7 @@ const options: FinanceOption[] = [
     description:
       "Consulte os dados e indicadores financeiros da Secretaria Municipal de Trabalho e Promoção Social.",
     kind: "data",
-    href: "/rma/dados-financeiro",
+    href: "/rma/dados-financeiros",
   },
 ];
 
