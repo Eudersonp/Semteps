@@ -5,7 +5,7 @@ type Service = {
   title: string;
   description: string;
   image?: string;
-  icon?: "identification" | "council" | "map" | "planning" | "normativas";
+  icon?: "identification" | "council" | "map" | "planning" | "normativas" | "agenda";
   tone: "emerald" | "teal" | "amber" | "blue" | "violet" | "rose";
   analysisLinks: {
     label: string;
@@ -14,6 +14,7 @@ type Service = {
   }[];
 };
 
+// Cartões exibidos no painel inicial. Cada item define título, descrição, identidade visual e destino.
 const services: Service[] = [
   // Primeira fileira: dois cartões
   {
@@ -143,6 +144,20 @@ const services: Service[] = [
       },
     ],
   },
+  // Novo cartão de agenda, seguindo o mesmo padrão de acesso e apresentação dos demais.
+  {
+    title: "Agenda da SEMTEPS",
+    description:
+      "Consulte a agenda de atividades, reuniões e compromissos da SEMTEPS.",
+    icon: "agenda",
+    tone: "teal",
+    analysisLinks: [
+      {
+        label: "Acessar agenda",
+        href: "/painel/agenda-semteps",
+      },
+    ],
+  },
 ];
 
 const toneStyles: Record<
@@ -181,6 +196,7 @@ const toneStyles: Record<
   },
 };
 
+// Preserva o fluxo de autenticação: o login retorna ao destino selecionado no cartão.
 function loginHref(destination: string) {
   return `/login?next=${encodeURIComponent(destination)}`;
 }
@@ -336,6 +352,7 @@ function PlanningIcon() {
   );
 }
 
+// Ícone de documento usado no cartão de Normativas SUAS.
 function NormativasIcon() {
   return (
     <svg
@@ -361,12 +378,30 @@ function NormativasIcon() {
   );
 }
 
+// Ícone de calendário para a nova opção Agenda da SEMTEPS.
+function AgendaIcon() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      fill="none"
+      className="h-8 w-8"
+      aria-hidden="true"
+    >
+      <rect x="5" y="7" width="26" height="24" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M11 5v5m14-5v5M5 13h26" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M11 19h4m-4 5h4m4-5h6m-6 5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Escolhe o ícone cadastrado para o cartão ou usa a imagem correspondente.
 function ServiceIcon({ service }: { service: Service }) {
   if (service.icon === "identification") return <IdentificationIcon />;
   if (service.icon === "council") return <CouncilIcon />;
   if (service.icon === "map") return <MapIcon />;
   if (service.icon === "planning") return <PlanningIcon />;
   if (service.icon === "normativas") return <NormativasIcon />;
+  if (service.icon === "agenda") return <AgendaIcon />;
 
   if (service.image) {
     return (
@@ -383,9 +418,11 @@ function ServiceIcon({ service }: { service: Service }) {
   return null;
 }
 
+// Página inicial: mantém a identidade visual original e apresenta os serviços em cartões responsivos.
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
+      {/* Cabeçalho de destaque com imagem temática integrada ao fundo. */}
       <div className="relative isolate overflow-hidden bg-[#102b27] text-white">
         <div
           className="pointer-events-none absolute inset-y-0 right-0 left-[44%] z-0 hidden overflow-hidden lg:block"
@@ -476,6 +513,7 @@ export default function HomePage() {
         </section>
       </div>
 
+      {/* Área principal dos cartões de acesso. */}
       <section
         id="areas"
         className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16"
@@ -506,6 +544,7 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* A grade e a distribuição responsiva dos cartões permanecem iguais. */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12 xl:gap-5">
           {services.map((service, index) => {
             const tone = toneStyles[service.tone];
@@ -547,6 +586,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="relative mt-5 grid gap-2.5 border-t border-[#efefe9] pt-4">
+                  {/* Cada ação continua encaminhando ao login com retorno para a rota definida. */}
                   {service.analysisLinks.map((action) => (
                     <Link
                       key={`${action.href}-${action.label}`}
