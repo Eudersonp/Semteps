@@ -4,13 +4,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
-// Estrutura baseada no código enviado pelo usuário.
-// Os dados e a análise abaixo correspondem ao CRAS Camélia Gaby Ferraz.
-type Metric = { label: string; values: number[]; kind: "sum" | "average" };
-type AnalysisSection = { title: string; paragraphs: string[]; bullets: string[] };
+// Página de análise do RMA do CRAS Camélia Gaby Ferraz.
+// A série contém os dados disponíveis de janeiro a setembro de 2026.
+// Ao atualizar os números, mantenha a ordem dos valores alinhada à constante `months`.
+type Metric = {
+  // Nome mostrado nos cartões, tabelas, textos e gráficos.
+  label: string;
+  // Uma posição para cada mês da constante `months`.
+  values: number[];
+  // Identifica se o indicador deve ser somado ou tratado como média.
+  kind: "sum" | "average";
+};
 
+// Tipo das análises textuais organizadas em painéis.
+type AnalysisSection = {
+  title: string;
+  paragraphs: string[];
+  bullets: string[];
+};
+
+// Meses para os quais há dados neste relatório.
 const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
 
+// Dados mensais do RMA. Os índices de 8 a 10 são benefícios eventuais.
 const metrics: Metric[] = [
   { label: "Famílias acompanhadas (PAIF)", values: [86, 102, 109, 128, 128, 117, 124, 125, 133], kind: "average" },
   { label: "Novas famílias no PAIF", values: [38, 16, 7, 34, 0, 12, 9, 1, 8], kind: "sum" },
@@ -33,6 +49,7 @@ const metrics: Metric[] = [
   { label: "Adultos de 18 a 59 anos (SCFV)", values: [0, 0, 0, 0, 0, 0, 0, 0, 0], kind: "average" },
 ];
 
+// Leituras técnicas, alertas e recomendações organizados por tema.
 const sections: AnalysisSection[] = [
   {
     title: "Atendimento às famílias (PAIF)",
@@ -106,6 +123,7 @@ const sections: AnalysisSection[] = [
   },
 ];
 
+// Perfil das novas famílias de setembro conforme os campos do RMA.
 const septemberProfile = [
   ["Famílias em extrema pobreza", 0],
   ["Famílias beneficiárias do Bolsa Família", 4],
@@ -115,6 +133,7 @@ const septemberProfile = [
   ["Famílias com criança/adolescente em acolhimento", 0],
 ] as const;
 
+// Totais acumulados de encaminhamentos e benefícios com sua composição mensal.
 const referrals = [
   ["Atualização do Cadastro Único", 59, "44 até agosto; 15 em setembro"],
   ["Inclusão no Cadastro Único", 18, "14 até agosto; 4 em setembro"],
@@ -125,8 +144,16 @@ const referrals = [
   ["Outros benefícios eventuais", 241, "193 até agosto; 48 em setembro"],
 ] as const;
 
-const fmt = (value: number) => value.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+// Formata os valores com separadores e convenções brasileiras.
+// Formatação determinística para que servidor e navegador gerem o mesmo HTML.
+const fmt = (value: number) => {
+  const rounded = Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.?0+$/, "");
+  const [integerPart, decimalPart] = rounded.split(".");
+  const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return decimalPart ? `${groupedInteger},${decimalPart}` : groupedInteger;
+};
 
+// Ícone de navegação usado no botão Início.
 function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
@@ -136,6 +163,7 @@ function ArrowIcon() {
   );
 }
 
+// Painel reutilizável para manter padrão visual entre as seções do relatório.
 function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -146,6 +174,7 @@ function Panel({ title, subtitle, children }: { title: string; subtitle?: string
   );
 }
 
+// Barra proporcional ao total de 125 novas famílias inseridas no PAIF.
 function ProfileBar({ label, value }: { label: string; value: number }) {
   const percent = (value / 125) * 100;
   return (
@@ -161,6 +190,7 @@ function ProfileBar({ label, value }: { label: string; value: number }) {
   );
 }
 
+// Faixas etárias e cores usadas no gráfico existente do SCFV.
 const groups = [
   { index: 12, label: "0 a 6 anos", color: "#86bba0", textColor: "#153728" },
   { index: 13, label: "7 a 14 anos", color: "#15803d", textColor: "#ffffff" },
@@ -168,6 +198,7 @@ const groups = [
   { index: 15, label: "Pessoas idosas", color: "#8a6bb5", textColor: "#ffffff" },
 ];
 
+// Gráfico de colunas empilhadas do SCFV; permanece preservado nesta versão.
 function ScfvChart({ indexes }: { indexes: number[] }) {
   return (
     <div>
@@ -229,16 +260,348 @@ function ScfvChart({ indexes }: { indexes: number[] }) {
   );
 }
 
+/**
+ * Desenha a linha mensal de um indicador em um SVG acessível.
+ * Cada série tem escala própria para que valores pequenos também fiquem visíveis.
+ */
+function BenefitLineChart({
+  metric,
+  color,
+  indexes,
+}: {
+  metric: Metric;
+  color: string;
+  indexes: number[];
+}) {
+  // Dimensões do SVG e espaços reservados para eixos e rótulos.
+  const width = 720;
+  const height = 250;
+  const left = 54;
+  const right = 18;
+  const top = 24;
+  const bottom = 42;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+
+  // Os valores são filtrados de acordo com os meses escolhidos pelo usuário.
+  const values = indexes.map((monthIndex) => metric.values[monthIndex]);
+  const maxValue = Math.max(...values, 1);
+  const axisMax = Math.ceil(maxValue / 5) * 5 || 5;
+
+  // Define a posição horizontal de cada ponto; um único mês fica centralizado.
+  const xForPosition = (position: number) =>
+    indexes.length === 1
+      ? left + chartWidth / 2
+      : left + (position / (indexes.length - 1)) * chartWidth;
+
+  // Converte o valor para coordenada vertical dentro da área do gráfico.
+  const yForValue = (value: number) =>
+    top + chartHeight - (value / axisMax) * chartHeight;
+
+  // Cada ponto guarda seu valor e seu mês para desenhar e descrever a série.
+  const points = values.map((value, position) => ({
+    x: xForPosition(position),
+    y: yForValue(value),
+    value,
+    monthIndex: indexes[position],
+  }));
+
+  // Sintaxe SVG para conectar os pontos em ordem cronológica.
+  const linePath = points
+    .map((point, position) => `${position === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+
+  const ticks = [0, axisMax / 2, axisMax];
+
+  return (
+    <article className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+      <div className="mb-3 flex items-start gap-3">
+        <span
+          className="mt-1 h-3 w-3 shrink-0 rounded-full"
+          style={{ backgroundColor: color }}
+          aria-hidden="true"
+        />
+        <div>
+          <h4 className="text-sm font-bold leading-5 text-slate-800">
+            {metric.label}
+          </h4>
+          <p className="mt-1 text-xs text-slate-500">
+            Evolução mensal · valores registrados
+          </p>
+        </div>
+      </div>
+
+      {/* Rolagem horizontal mantém os rótulos legíveis em telas estreitas. */}
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label={`Evolução mensal: ${metric.label}`}
+          aria-description={points
+            .map((point) => `${months[point.monthIndex]}: ${fmt(point.value)}`)
+            .join("; ")}
+          className="min-w-[560px] w-full"
+        >
+
+          {/* Linhas-guia e rótulos da escala vertical. */}
+          {ticks.map((tick) => {
+            const y = yForValue(tick);
+            return (
+              <g key={tick}>
+                <line
+                  x1={left}
+                  x2={width - right}
+                  y1={y}
+                  y2={y}
+                  stroke="#e2e8f0"
+                  strokeDasharray={tick === 0 ? undefined : "4 4"}
+                />
+                <text
+                  x={left - 10}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize="11"
+                  fill="#64748b"
+                >
+                  {fmt(tick)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* A linha é mostrada quando há mais de um mês selecionado. */}
+          {points.length > 1 && (
+            <path
+              d={linePath}
+              fill="none"
+              stroke={color}
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+
+          {/* Pontos, valores numéricos e meses da série. */}
+          {points.map((point) => (
+            <g key={point.monthIndex}>
+              {points.length === 1 && (
+                <line
+                  x1={left}
+                  x2={width - right}
+                  y1={point.y}
+                  y2={point.y}
+                  stroke={color}
+                  strokeWidth="2"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+              )}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r="5"
+                fill="white"
+                stroke={color}
+                strokeWidth="3"
+              >
+                <title>
+                  {months[point.monthIndex]}: {fmt(point.value)}
+                </title>
+              </circle>
+              <text
+                x={point.x}
+                y={Math.max(top + 12, point.y - 11)}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="700"
+                fill="#334155"
+              >
+                {fmt(point.value)}
+              </text>
+              <text
+                x={point.x}
+                y={height - 12}
+                textAnchor="middle"
+                fontSize="11"
+                fill="#64748b"
+              >
+                {months[point.monthIndex]}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </article>
+  );
+}
+
+/**
+ * Mostra os quatro indicadores principais no formato 2×2 da página de referência.
+ * Reutiliza o componente de linha para conservar escalas, rótulos e acessibilidade.
+ */
+function MainIndicatorsChart({ indexes }: { indexes: number[] }) {
+  // Mantém a mesma seleção visual da imagem: PAIF, novas famílias, atendimentos e visitas.
+  const mainMetrics = [
+    { metric: metrics[0], color: "#15803d" },
+    { metric: metrics[1], color: "#d19a3a" },
+    { metric: metrics[2], color: "#0f766e" },
+    { metric: metrics[3], color: "#8a6bb5" },
+  ];
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {mainMetrics.map(({ metric, color }) => (
+        <BenefitLineChart
+          key={metric.label}
+          metric={metric}
+          color={color}
+          indexes={indexes}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Apresenta a evolução total e por categoria dos benefícios eventuais,
+ * além de uma tabela com os números exatos do período filtrado.
+ */
+function BenefitsEvolutionChart({ indexes }: { indexes: number[] }) {
+  // Categorias são referenciadas pelos índices definidos em `metrics`.
+  const categories = [
+    { metric: metrics[8], color: "#15803d" },
+    { metric: metrics[9], color: "#d19a3a" },
+    { metric: metrics[10], color: "#3478a5" },
+  ];
+
+  // Calcula a soma mensal das três categorias para traçar uma linha total.
+  const totalMetric: Metric = {
+    label: "Total de benefícios eventuais",
+    values: months.map((_, monthIndex) =>
+      categories.reduce(
+        (sum, category) => sum + category.metric.values[monthIndex],
+        0,
+      ),
+    ),
+    kind: "sum",
+  };
+
+  // O total aparece primeiro; em seguida, cada benefício aparece em uma linha própria.
+  const charts = [
+    { metric: totalMetric, color: "#0f766e" },
+    ...categories,
+  ];
+
+  // Soma os meses atualmente selecionados para a coluna de total da tabela.
+  const periodTotal = indexes.reduce(
+    (sum, monthIndex) => sum + totalMetric.values[monthIndex],
+    0,
+  );
+
+  return (
+    <div className="border-t border-slate-200 pt-5">
+      <div className="mb-4">
+        <h3 className="text-base font-extrabold text-slate-900">
+          Evolução dos benefícios eventuais
+        </h3>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Dados de janeiro a setembro de 2026. Outubro a dezembro ainda não
+          constam na base recebida. Cada linha usa escala própria.
+        </p>
+      </div>
+
+      {/* Grade responsiva com o total e as três categorias de benefício. */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {charts.map(({ metric, color }) => (
+          <BenefitLineChart
+            key={metric.label}
+            metric={metric}
+            color={color}
+            indexes={indexes}
+          />
+        ))}
+      </div>
+
+      {/* Tabela complementar para leitura dos valores exatos por competência. */}
+      <div className="mt-5 overflow-x-auto">
+        <table className="w-full min-w-[680px] border-collapse text-xs">
+          <caption className="sr-only">
+            Benefícios eventuais por mês e total do período selecionado
+          </caption>
+          <thead className="bg-slate-50 text-slate-500">
+            <tr>
+              <th scope="col" className="px-3 py-2.5 text-left">Benefício</th>
+              {indexes.map((monthIndex) => (
+                <th key={monthIndex} scope="col" className="px-3 py-2.5 text-right">
+                  {months[monthIndex]}
+                </th>
+              ))}
+              <th scope="col" className="whitespace-nowrap px-3 py-2.5 text-right">
+                Total do período
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map(({ metric }) => {
+              // Soma somente os meses selecionados para esta categoria.
+              const total = indexes.reduce(
+                (sum, monthIndex) => sum + metric.values[monthIndex],
+                0,
+              );
+              return (
+                <tr key={metric.label} className="border-b border-slate-100 even:bg-slate-50">
+                  <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold text-slate-700">
+                    {metric.label}
+                  </th>
+                  {indexes.map((monthIndex) => (
+                    <td key={monthIndex} className="px-3 py-2.5 text-right tabular-nums text-slate-600">
+                      {fmt(metric.values[monthIndex])}
+                    </td>
+                  ))}
+                  <td className="bg-green-50 px-3 py-2.5 text-right font-bold tabular-nums text-green-800">
+                    {fmt(total)}
+                  </td>
+                </tr>
+              );
+            })}
+            <tr className="bg-green-50/70">
+              <th scope="row" className="px-3 py-2.5 text-left font-extrabold text-slate-800">
+                Total mensal
+              </th>
+              {indexes.map((monthIndex) => (
+                <td key={monthIndex} className="px-3 py-2.5 text-right font-bold tabular-nums text-slate-800">
+                  {fmt(totalMetric.values[monthIndex])}
+                </td>
+              ))}
+              <td className="px-3 py-2.5 text-right font-black tabular-nums text-green-800">
+                {fmt(periodTotal)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// Componente principal da página; controla o período e os valores agregados.
 export default function RmaCrasCameliaGabyPage() {
+  // "all" mantém os nove meses; qualquer outro valor é o índice de um mês.
   const [selectedMonth, setSelectedMonth] = useState("all");
+
+  // Índices dos meses escolhidos, reutilizados por cartões, tabela e gráficos.
   const indexes = selectedMonth === "all" ? months.map((_, index) => index) : [Number(selectedMonth)];
+
+  // Soma métricas de fluxo e calcula média para indicadores classificados como estoque.
   const aggregate = (index: number) => {
     const metric = metrics[index];
     const sum = indexes.reduce((total, monthIndex) => total + metric.values[monthIndex], 0);
     return metric.kind === "average" ? sum / indexes.length : sum;
   };
+  // Define o texto do período exibido em cartões e painéis.
   const fullPeriod = selectedMonth === "all";
   const period = fullPeriod ? "Janeiro a setembro de 2026" : `${months[Number(selectedMonth)]} de 2026`;
+  // Cartões de resumo do período filtrado.
   const kpis = [
     { label: fullPeriod ? "Média de famílias no PAIF" : "Famílias no PAIF", value: aggregate(0), note: "Estoque de famílias em acompanhamento" },
     { label: "Novas famílias no PAIF", value: aggregate(1), note: "Inserções no período selecionado" },
@@ -250,6 +613,7 @@ export default function RmaCrasCameliaGabyPage() {
 
   return (
     <main className="min-h-screen bg-[#f3f2ed] text-slate-900">
+      {/* Cabeçalho institucional com os atalhos de início e retorno ao painel PSB. */}
       <header className="border-b border-white/10 bg-[#102b27] text-white print:hidden">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
           <Link
@@ -313,6 +677,7 @@ export default function RmaCrasCameliaGabyPage() {
         </div>
       </header>
 
+      {/* Conteúdo principal: título, filtro, indicadores, tabelas, gráficos e análise. */}
       <div className="mx-auto w-full max-w-[1440px] space-y-6 px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
@@ -338,15 +703,18 @@ export default function RmaCrasCameliaGabyPage() {
         </div>
 
         <p className="text-sm text-slate-600">O filtro atualiza os indicadores, a tabela e o gráfico. A análise geral, os perfis e as recomendações abrangem janeiro a setembro.</p>
+        {/* Indicadores resumidos em cartões que se reorganizam conforme a largura. */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {kpis.map((kpi) => <div key={kpi.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-xs font-semibold text-slate-500">{kpi.label}</p><p className="mt-3 text-3xl font-black text-green-700">{fmt(kpi.value)}</p><p className="mt-2 text-xs leading-5 text-slate-500">{kpi.note}</p></div>)}
         </div>
 
+        {/* Síntese quantitativa do período completo com destaques do mês de setembro. */}
         <Panel title="Leitura geral do período" subtitle="Janeiro a setembro de 2026">
           <p className="text-sm leading-7 text-slate-600">O CRAS registrou média de 116,9 famílias acompanhadas, 125 novas inserções, 1.171 atendimentos particularizados, 168 visitas domiciliares e 256 benefícios eventuais. Setembro teve 133 famílias acompanhadas, 140 atendimentos, 62 visitas e 52 benefícios eventuais. As oscilações de setembro merecem validação com os registros de origem antes de serem interpretadas como aumento efetivo da demanda.</p>
           <div className="grid gap-4 sm:grid-cols-3">{[["133", "famílias acompanhadas em setembro, maior estoque do período"], ["62", "visitas em setembro; maior valor da série"], ["448", "participações em palestras e oficinas no período"]].map(([value, label]) => <div key={label} className="rounded-lg bg-slate-50 p-4"><p className="text-xl font-extrabold text-slate-800">{value}</p><p className="mt-1 text-xs leading-5 text-slate-500">{label}</p></div>)}</div>
         </Panel>
 
+        {/* Tabela de todos os indicadores; gráficos ficam logo abaixo. */}
         <Panel title="Índices mensais" subtitle={period}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[780px] border-collapse text-sm">
@@ -356,8 +724,24 @@ export default function RmaCrasCameliaGabyPage() {
             </table>
           </div>
           <p className="text-xs leading-6 text-slate-500">Total do período é a soma dos meses selecionados; média mensal é o total dividido pela quantidade de meses selecionados. Para indicadores de estoque e participação, o total soma registros mensais e não representa famílias ou pessoas únicas. Perfis familiares podem se sobrepor.</p>
+          {/* Gráficos principais no padrão 2×2 mostrado na imagem de referência. */}
+          <div className="border-t border-slate-200 pt-5">
+            <div className="mb-4">
+              <h3 className="text-base font-extrabold text-slate-900">
+                Evolução mensal dos principais indicadores
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                Cada gráfico usa sua própria escala vertical. Os valores junto
+                aos pontos indicam os registros de cada mês.
+              </p>
+            </div>
+            <MainIndicatorsChart indexes={indexes} />
+          </div>
+          {/* Linha gráfica de benefícios adicionada sem remover o gráfico existente do SCFV. */}
+          <BenefitsEvolutionChart indexes={indexes} />
         </Panel>
 
+        {/* Painéis analíticos com perfis, encaminhamentos, SCFV e recomendações. */}
         {sections.map((section) => (
           <Panel key={section.title} title={section.title} subtitle="Janeiro a setembro de 2026">
             {section.title === "Perfil das 125 novas famílias" && (
@@ -395,10 +779,12 @@ export default function RmaCrasCameliaGabyPage() {
           </Panel>
         ))}
 
+        {/* Conclusão consolidada para orientar o acompanhamento da gestão. */}
         <Panel title="Conclusão" subtitle="Síntese para acompanhamento da gestão">
           <p className="text-sm leading-7 text-slate-600">Os dados apontam crescimento do estoque PAIF e ampliação dos registros de visitas, atendimentos e benefícios em setembro. Ao mesmo tempo, há alterações concentradas em um mês e mudanças de composição no SCFV que precisam de conferência. A prioridade é validar os registros de setembro, restabelecer comparabilidade entre competências e usar os dados revisados para orientar a continuidade das ofertas e a organização do acompanhamento familiar.</p>
         </Panel>
 
+        {/* Fontes, limites de interpretação e identificação institucional. */}
         <footer className="border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500">
           <p>Fontes: base do RMA de janeiro a agosto e RMA do CRAS Camélia Gaby Ferraz de setembro de 2026, unidade nº 15065040087.</p>
           <p className="mt-2">Os indicadores representam registros administrativos do serviço, não cobertura populacional nem contagem garantida de usuários únicos. Esta página não envia dados ao sistema oficial do RMA.</p>

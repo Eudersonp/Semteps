@@ -29,6 +29,9 @@ const monthly: MonthData[] = [
   { month: "Set", stock: 97, cases: 14, victims: 12, individual: 141, visits: 75, mse: 7, exits: 19, female: 11, male: 1 },
 ];
 
+// Lista dos meses compartilhada pela tabela, pelo filtro e pelo gráfico de violências.
+const months = monthly.map((row) => row.month);
+
 const violations = [
   ["Abuso sexual contra crianças e adolescentes", "21", "0", "18 meninas e 3 meninos; 11 registros de 7 a 12 anos; pico em maio (9)."],
   ["Negligência ou abandono de crianças", "11", "0", "6 meninos e 5 meninas; 10 registros até 6 anos."],
@@ -43,6 +46,36 @@ const violations = [
   ["Pessoa em situação de rua ingressante no PAEFI", "1", "0", "Homem de 18 a 59 anos, em agosto."],
   ["Tráfico de pessoas", "0", "0", "Nenhum registro no período."],
   ["Discriminação por orientação sexual", "0", "0", "Oito meses zerados; junho sem preenchimento."],
+];
+
+// Séries mensais das duas violências com maior número de registros no período.
+// Os valores foram transcritos dos quadros mensais do RMA.
+const topViolencesMonthly = [
+  {
+    label: "Violência intrafamiliar contra mulheres adultas",
+    color: "#047857",
+    values: [1, 2, 6, 1, 3, 7, 2, 2, 5],
+  },
+  {
+    label: "Abuso sexual contra crianças e adolescentes",
+    color: "#d97706",
+    values: [0, 0, 1, 1, 9, 3, 5, 2, 0],
+  },
+];
+
+// Outras séries mensais transcritas dos quadros do RMA. As três marcadas
+// abaixo têm divergência entre a soma mensal e o total da tabela; a nota
+// aparece junto ao gráfico para orientar a conferência dos dados de origem.
+const otherViolencesMonthly = [
+  { id: "elderly_neglect", label: "Negligência ou abandono de pessoas idosas", color: "#2563eb", values: [1, 0, 0, 2, 0, 2, 0, 1, 0] },
+  { id: "sexual_exploitation", label: "Exploração sexual contra crianças e adolescentes", color: "#9333ea", values: [0, 0, 0, 0, 0, 0, 1, 0, 0] },
+  { id: "disability_neglect", label: "Pessoa com deficiência vítima de negligência", color: "#0891b2", values: [0, 0, 0, 1, 0, 0, 0, 0, 0] },
+  { id: "disability_intrafamily", label: "Pessoa com deficiência vítima de violência intrafamiliar", color: "#db2777", values: [0, 0, 0, 0, 0, 0, 0, 0, 1] },
+  { id: "street", label: "Pessoa em situação de rua ingressante no PAEFI", color: "#ea580c", values: [0, 0, 0, 0, 0, 0, 0, 1, 0] },
+  { id: "trafficking", label: "Tráfico de pessoas", color: "#475569", values: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
+  { id: "child_neglect", label: "Negligência ou abandono de crianças", color: "#65a30d", values: [0, 1, 1, 0, 2, 1, 1, 4, 0], note: "A soma dos valores mensais é 10, enquanto a tabela de totais informa 11; confira o RMA de origem." },
+  { id: "child_labor", label: "Trabalho infantil", color: "#c2410c", values: [0, 0, 2, 2, 0, 0, 0, 0, 0], note: "A série mensal soma 4, enquanto a tabela de totais informa 5; confira o RMA de origem." },
+  { id: "elderly_intrafamily", label: "Violência intrafamiliar contra pessoas idosas", color: "#7c3aed", values: [0, 2, 0, 0, 1, 0, 0, 1, 0], note: "A série mensal soma 4, enquanto a tabela de totais informa 5; confira o RMA de origem." },
 ];
 
 const newFamilyProfiles = [
@@ -151,8 +184,221 @@ function VictimsChart() {
   );
 }
 
+/**
+ * Mostra a evolução mensal das duas categorias com mais registros no RMA.
+ * O filtro da página também filtra os pontos e recalcula o total exibido na legenda.
+ */
+function ViolenceChart({ selectedMonth }: { selectedMonth: string }) {
+  const selectedIndexes =
+    selectedMonth === "all"
+      ? months.map((_, index) => index)
+      : [months.indexOf(selectedMonth)];
+
+  // Escala vertical comum às duas linhas, preservando a comparação entre elas.
+  const width = 780;
+  const height = 320;
+  const left = 54;
+  const right = 24;
+  const top = 30;
+  const bottom = 46;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+  const peak = Math.max(...topViolencesMonthly.flatMap((series) => series.values), 1);
+  const axisMax = Math.ceil(peak / 5) * 5 || 5;
+  const ticks = [0, axisMax / 2, axisMax];
+
+  // Um único mês fica centralizado; vários meses ocupam o eixo em ordem cronológica.
+  const xForPosition = (position: number) =>
+    selectedIndexes.length === 1
+      ? left + chartWidth / 2
+      : left + (position / (selectedIndexes.length - 1)) * chartWidth;
+  const yForValue = (value: number) =>
+    top + chartHeight - (value / axisMax) * chartHeight;
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-600" aria-label="Legenda do gráfico">
+        {topViolencesMonthly.map((series) => {
+          const selectedTotal = selectedIndexes.reduce(
+            (total, monthIndex) => total + series.values[monthIndex],
+            0,
+          );
+          return (
+            <span key={series.label} className="inline-flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: series.color }}
+                aria-hidden="true"
+              />
+              <span>
+                {series.label} · total do período: <strong>{selectedTotal}</strong>
+              </span>
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label="Gráfico de linhas com a evolução mensal das duas violências mais registradas"
+          className="min-w-[620px] w-full"
+        >
+          {/* Linhas de escala e valores do eixo vertical. */}
+          {ticks.map((tick) => {
+            const y = yForValue(tick);
+            return (
+              <g key={tick}>
+                <line
+                  x1={left}
+                  x2={width - right}
+                  y1={y}
+                  y2={y}
+                  stroke="#e2e8f0"
+                  strokeDasharray={tick === 0 ? undefined : "4 4"}
+                />
+                <text
+                  x={left - 10}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize="11"
+                  fill="#64748b"
+                >
+                  {tick}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Desenha a linha, os pontos, os valores e os meses de cada série. */}
+          {topViolencesMonthly.map((series, seriesIndex) => {
+            const points = selectedIndexes.map((monthIndex, position) => ({
+              x: xForPosition(position),
+              y: yForValue(series.values[monthIndex]),
+              value: series.values[monthIndex],
+              monthIndex,
+            }));
+            const linePath = points
+              .map((point, position) => `${position === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+              .join(" ");
+
+            return (
+              <g key={series.label}>
+                {points.length > 1 && (
+                  <path
+                    d={linePath}
+                    fill="none"
+                    stroke={series.color}
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
+                {points.map((point) => (
+                  <g key={`${series.label}-${months[point.monthIndex]}`}>
+                    <circle
+                      cx={point.x}
+                      cy={point.y}
+                      r="5"
+                      fill="white"
+                      stroke={series.color}
+                      strokeWidth="3"
+                    />
+                    <text
+                      x={point.x}
+                      y={point.y + (seriesIndex === 0 ? -11 : 18)}
+                      textAnchor="middle"
+                      fontSize="11"
+                      fontWeight="700"
+                      fill={series.color}
+                    >
+                      {point.value}
+                    </text>
+                    {seriesIndex === 0 && (
+                      <text
+                        x={point.x}
+                        y={height - 12}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fill="#64748b"
+                      >
+                        {months[point.monthIndex]}
+                      </text>
+                    )}
+                  </g>
+                ))}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      <p className="mt-3 text-xs leading-6 text-slate-500">
+        Os valores junto aos pontos são registros mensais. Com todos os meses selecionados, a legenda mostra somente o somatório de cada série no período; ao selecionar um mês, mostra o valor daquele mês. As categorias são indicadores distintos e não devem ser somadas para estimar vítimas únicas.
+      </p>
+    </div>
+  );
+}
+
+/** Gráfico de linha selecionável para as demais situações registradas. */
+function OtherViolenceChart({
+  selectedMonth,
+  violenceId,
+  onViolenceChange,
+}: {
+  selectedMonth: string;
+  violenceId: string;
+  onViolenceChange: (id: string) => void;
+}) {
+  const series = otherViolencesMonthly.find((item) => item.id === violenceId) ?? otherViolencesMonthly[0];
+  const selectedIndexes = selectedMonth === "all" ? months.map((_, index) => index) : [months.indexOf(selectedMonth)].filter((index) => index >= 0);
+  const width = 780;
+  const height = 300;
+  const left = 54;
+  const right = 24;
+  const top = 30;
+  const bottom = 46;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+  const visibleValues = selectedIndexes.map((index) => series.values[index]);
+  const axisMax = Math.max(1, Math.ceil(Math.max(...visibleValues, 0) / 5) * 5);
+  const ticks = Array.from(new Set([0, Math.ceil(axisMax / 2), axisMax]));
+  const xForPosition = (position: number) => selectedIndexes.length === 1 ? left + chartWidth / 2 : left + (position / (selectedIndexes.length - 1)) * chartWidth;
+  const yForValue = (value: number) => top + chartHeight - (value / axisMax) * chartHeight;
+  const total = visibleValues.reduce((sum, value) => sum + value, 0);
+  const points = selectedIndexes.map((monthIndex, position) => ({ x: xForPosition(position), y: yForValue(series.values[monthIndex]), value: series.values[monthIndex], monthIndex }));
+  const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <label htmlFor="other-violence" className="block text-sm font-semibold text-slate-700">
+          Escolha a violência ou situação
+          <select id="other-violence" value={series.id} onChange={(event) => onViolenceChange(event.target.value)} className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-green-600 sm:min-w-[360px]">
+            {otherViolencesMonthly.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+          </select>
+        </label>
+        <p className="text-sm text-slate-600">{selectedMonth === "all" ? "Total no período" : `Registros em ${selectedMonth}`} : <strong className="text-slate-900">{total}</strong></p>
+      </div>
+      <div className="overflow-x-auto">
+        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Gráfico de linha mensal: ${series.label}`} className="min-w-[620px] w-full">
+          {ticks.map((tick) => {
+            const y = yForValue(tick);
+            return <g key={tick}><line x1={left} x2={width - right} y1={y} y2={y} stroke="#e2e8f0" strokeDasharray={tick === 0 ? undefined : "4 4"} /><text x={left - 10} y={y + 4} textAnchor="end" fontSize="11" fill="#64748b">{tick}</text></g>;
+          })}
+          {points.length > 1 && <path d={path} fill="none" stroke={series.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />}
+          {points.map((point) => <g key={months[point.monthIndex]}><circle cx={point.x} cy={point.y} r="5" fill="white" stroke={series.color} strokeWidth="3" /><text x={point.x} y={point.y - 11} textAnchor="middle" fontSize="11" fontWeight="700" fill={series.color}>{point.value}</text><text x={point.x} y={height - 12} textAnchor="middle" fontSize="11" fill="#64748b">{months[point.monthIndex]}</text></g>)}
+        </svg>
+      </div>
+      <p className="mt-3 text-xs leading-6 text-slate-500">Os pontos mostram os registros mensais. {series.note ?? "Série mensal conforme os quadros do RMA."} As categorias são indicadores distintos e não representam necessariamente pessoas únicas.</p>
+    </div>
+  );
+}
+
 export default function RmaCreasPage() {
   const [selectedMonth, setSelectedMonth] = useState("all");
+  const [selectedOtherViolence, setSelectedOtherViolence] = useState(otherViolencesMonthly[0].id);
   const rows = selectedMonth === "all" ? monthly : monthly.filter((row) => row.month === selectedMonth);
   const fullPeriod = selectedMonth === "all";
   const sum = (key: "stock" | "cases" | "victims" | "individual" | "visits" | "mse") =>
@@ -307,6 +553,17 @@ export default function RmaCreasPage() {
         </div>
 
         <Panel title="Violências e situações identificadas" subtitle="Janeiro a setembro · categorias podem se sobrepor; não somar para obter vítimas únicas.">
+          {/* Linha de evolução das duas categorias com maior frequência no RMA. */}
+          <div className="mb-6">
+            <h3 className="mb-3 text-sm font-bold text-slate-800">Evolução mensal das violências mais registradas</h3>
+            <p className="mb-4 text-sm leading-6 text-slate-600">Acompanhe mês a mês a violência intrafamiliar contra mulheres adultas e o abuso sexual contra crianças e adolescentes.</p>
+            <ViolenceChart selectedMonth={selectedMonth} />
+          </div>
+          <div className="mb-6 border-t border-slate-200 pt-6">
+            <h3 className="mb-3 text-sm font-bold text-slate-800">Evolução mensal de outras violências e situações</h3>
+            <p className="mb-4 text-sm leading-6 text-slate-600">Selecione uma categoria no menu para atualizar o gráfico de linha.</p>
+            <OtherViolenceChart selectedMonth={selectedMonth} violenceId={selectedOtherViolence} onViolenceChange={setSelectedOtherViolence} />
+          </div>
           <div className="overflow-x-auto"><table className="w-full min-w-[850px] border-collapse text-sm"><thead className="bg-slate-50 text-slate-500"><tr><th scope="col" className="border-b border-slate-200 px-3 py-3 text-left">Situação</th><th scope="col" className="border-b border-slate-200 px-3 py-3 text-right">Jan–set</th><th scope="col" className="border-b border-slate-200 px-3 py-3 text-right">Setembro</th><th scope="col" className="border-b border-slate-200 px-3 py-3 text-left">Perfil e observações</th></tr></thead><tbody>{violations.map(([label, total, september, detail]) => <tr key={label} className="border-b border-slate-100 even:bg-slate-50"><th scope="row" className="px-3 py-3 text-left font-semibold text-slate-700">{label}</th><td className="px-3 py-3 text-right font-bold text-green-700">{total}</td><td className="px-3 py-3 text-right text-slate-600">{september}</td><td className="px-3 py-3 leading-6 text-slate-500">{detail}</td></tr>)}</tbody></table></div>
           <p className="mt-4 text-sm leading-7 text-slate-600">Entre as 45 classificações de C.1 a C.4: abuso sexual representa 46,7%, violência intrafamiliar 26,7%, negligência ou abandono 24,4% e exploração sexual 2,2%. Trabalho infantil é registrado separadamente em C.5.</p>
         </Panel>

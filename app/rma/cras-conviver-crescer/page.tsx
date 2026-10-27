@@ -4,330 +4,154 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
-// Arquivo completo para app/rma/cras-conviver-crescer/page.tsx.
-// Dados estáticos de janeiro a setembro de 2026, com base nos RMA anexados.
-type Metric = { label: string; values: number[]; kind: "sum" | "average" };
+// Esta página apresenta a análise do RMA do CRAS Conviver e Crescer.
+// Os dados disponíveis neste arquivo cobrem janeiro a setembro de 2026.
+// Para atualizar a série, altere os valores mensais em `metrics` e confira as análises.
+type Metric = {
+  // Nome exibido na tabela, nos gráficos e nos cartões de resumo.
+  label: string;
+  // Valores mensais, na mesma ordem da constante `months`.
+  values: number[];
+  // Informa se o indicador deve ser somado ou tratado como média no resumo.
+  kind: "sum" | "average";
+};
+
+// Meses disponíveis na base recebida.
 const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+
+// Indicadores mensais. Os índices deste array são reutilizados pelos gráficos.
 const metrics: Metric[] = [
   {
-    "label": "Famílias acompanhadas (PAIF)",
-    "values": [
-      122,
-      125,
-      135,
-      171,
-      156,
-      164,
-      170,
-      124,
-      189
-    ],
-    "kind": "average"
+    label: "Famílias acompanhadas (PAIF)",
+    values: [122, 125, 135, 171, 156, 164, 170, 124, 189],
+    kind: "average",
   },
   {
-    "label": "Novas famílias no PAIF",
-    "values": [
-      47,
-      10,
-      11,
-      6,
-      3,
-      11,
-      6,
-      9,
-      3
-    ],
-    "kind": "sum"
+    label: "Novas famílias no PAIF",
+    values: [47, 10, 11, 6, 3, 11, 6, 9, 3],
+    kind: "sum",
   },
   {
-    "label": "Atendimentos particularizados",
-    "values": [
-      440,
-      445,
-      625,
-      473,
-      362,
-      329,
-      309,
-      130,
-      517
-    ],
-    "kind": "sum"
+    label: "Atendimentos particularizados",
+    values: [440, 445, 625, 473, 362, 329, 309, 130, 517],
+    kind: "sum",
   },
   {
-    "label": "Visitas domiciliares",
-    "values": [
-      81,
-      48,
-      48,
-      46,
-      58,
-      104,
-      77,
-      12,
-      81
-    ],
-    "kind": "sum"
+    label: "Visitas domiciliares",
+    values: [81, 48, 48, 46, 58, 104, 77, 12, 81],
+    kind: "sum",
   },
   {
-    "label": "Enc. Cadastro Único – inclusão",
-    "values": [
-      5,
-      1,
-      5,
-      0,
-      1,
-      3,
-      2,
-      3,
-      2
-    ],
-    "kind": "sum"
+    label: "Enc. Cadastro Único – inclusão",
+    values: [5, 1, 5, 0, 1, 3, 2, 3, 2],
+    kind: "sum",
   },
   {
-    "label": "Enc. Cadastro Único – atualização",
-    "values": [
-      13,
-      14,
-      26,
-      12,
-      13,
-      11,
-      4,
-      3,
-      12
-    ],
-    "kind": "sum"
+    label: "Enc. Cadastro Único – atualização",
+    values: [13, 14, 26, 12, 13, 11, 4, 3, 12],
+    kind: "sum",
   },
   {
-    "label": "Enc. acesso ao BPC",
-    "values": [
-      0,
-      4,
-      4,
-      1,
-      0,
-      2,
-      1,
-      3,
-      0
-    ],
-    "kind": "sum"
+    label: "Enc. acesso ao BPC",
+    values: [0, 4, 4, 1, 0, 2, 1, 3, 0],
+    kind: "sum",
   },
   {
-    "label": "Enc. ao CREAS",
-    "values": [
-      0,
-      2,
-      2,
-      1,
-      3,
-      3,
-      3,
-      1,
-      15
-    ],
-    "kind": "sum"
+    label: "Enc. ao CREAS",
+    values: [0, 2, 2, 1, 3, 3, 3, 1, 15],
+    kind: "sum",
   },
   {
-    "label": "Auxílio-natalidade",
-    "values": [
-      0,
-      0,
-      0,
-      0,
-      1,
-      4,
-      0,
-      5,
-      6
-    ],
-    "kind": "sum"
+    label: "Auxílio-natalidade",
+    values: [0, 0, 0, 0, 1, 4, 0, 5, 6],
+    kind: "sum",
   },
   {
-    "label": "Auxílio-funeral",
-    "values": [
-      3,
-      10,
-      3,
-      2,
-      4,
-      4,
-      5,
-      0,
-      4
-    ],
-    "kind": "sum"
+    label: "Auxílio-funeral",
+    values: [3, 10, 3, 2, 4, 4, 5, 0, 4],
+    kind: "sum",
   },
   {
-    "label": "Outros benefícios eventuais",
-    "values": [
-      37,
-      53,
-      75,
-      66,
-      34,
-      129,
-      63,
-      65,
-      95
-    ],
-    "kind": "sum"
+    label: "Outros benefícios eventuais",
+    values: [37, 53, 75, 66, 34, 129, 63, 65, 95],
+    kind: "sum",
   },
   {
-    "label": "Famílias em grupos do PAIF",
-    "values": [
-      19,
-      17,
-      11,
-      27,
-      63,
-      14,
-      14,
-      10,
-      19
-    ],
-    "kind": "average"
+    label: "Famílias em grupos do PAIF",
+    values: [19, 17, 11, 27, 63, 14, 14, 10, 19],
+    kind: "average",
   },
   {
-    "label": "Crianças 0–6 (SCFV)",
-    "values": [
-      28,
-      19,
-      29,
-      29,
-      31,
-      28,
-      29,
-      26,
-      26
-    ],
-    "kind": "average"
+    label: "Crianças 0–6 (SCFV)",
+    values: [28, 19, 29, 29, 31, 28, 29, 26, 26],
+    kind: "average",
   },
   {
-    "label": "Crianças/adolesc. 7–14 (SCFV)",
-    "values": [
-      139,
-      158,
-      163,
-      172,
-      169,
-      163,
-      164,
-      47,
-      183
-    ],
-    "kind": "average"
+    label: "Crianças/adolesc. 7–14 (SCFV)",
+    values: [139, 158, 163, 172, 169, 163, 164, 47, 183],
+    kind: "average",
   },
   {
-    "label": "Adolescentes 15–17 (SCFV)",
-    "values": [
-      19,
-      19,
-      20,
-      10,
-      22,
-      22,
-      22,
-      15,
-      32
-    ],
-    "kind": "average"
+    label: "Adolescentes 15–17 (SCFV)",
+    values: [19, 19, 20, 10, 22, 22, 22, 15, 32],
+    kind: "average",
   },
   {
-    "label": "Idosos (SCFV)",
-    "values": [
-      188,
-      186,
-      187,
-      189,
-      186,
-      177,
-      34,
-      15,
-      177
-    ],
-    "kind": "average"
+    label: "Idosos (SCFV)",
+    values: [188, 186, 187, 189, 186, 177, 34, 15, 177],
+    kind: "average",
   },
   {
-    "label": "Pessoas com deficiência",
-    "values": [
-      17,
-      17,
-      23,
-      23,
-      20,
-      17,
-      28,
-      5,
-      27
-    ],
-    "kind": "average"
+    label: "Pessoas com deficiência",
+    values: [17, 17, 23, 23, 20, 17, 28, 5, 27],
+    kind: "average",
   },
   {
-    "label": "Participantes de palestras e oficinas",
-    "values": [
-      170,
-      161,
-      188,
-      291,
-      361,
-      517,
-      156,
-      31,
-      477
-    ],
-    "kind": "sum"
+    label: "Participantes de palestras e oficinas",
+    values: [170, 161, 188, 291, 361, 517, 156, 31, 477],
+    kind: "sum",
   },
   {
-    "label": "Adultos 18–59 anos (SCFV)",
-    "values": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "kind": "average"
-  }
+    label: "Adultos 18–59 anos (SCFV)",
+    values: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    kind: "average",
+  },
 ];
+
+// Análises qualitativas organizadas em painéis temáticos na parte final da página.
 const sections = [
   {
     title: "Atendimento às famílias (PAIF)",
     paragraphs: [
       "De janeiro a setembro, o estoque informado soma 1.356 registros mensais e média de 150,7 famílias acompanhadas. O total somado não representa famílias únicas. O estoque variou de 122 em janeiro ao máximo de 189 em setembro; após cair a 124 em agosto, cresceu 52,4% no mês. É uma variação do estoque declarado e, isoladamente, não comprova aumento da demanda.",
       "Foram 106 novas inserções: 47 em janeiro (44,3% do período) e 3 em setembro. De fevereiro a setembro, foram 59 inserções, média de 7,4 por mês. O valor de janeiro destoa; conferir se houve lançamento acumulado ou diferença de competência.",
-      "Os atendimentos particularizados totalizaram 3.630 (média de 403,3 por mês). Setembro registrou 517, ante 130 em agosto (+297,7%), ainda abaixo do pico de março (625). As visitas somaram 555 (média de 61,7); setembro teve 81 após 12 em agosto, e o pico foi 104 em junho."
+      "Os atendimentos particularizados totalizaram 3.630 (média de 403,3 por mês). Setembro registrou 517, ante 130 em agosto (+297,7%), ainda abaixo do pico de março (625). As visitas somaram 555 (média de 61,7); setembro teve 81 após 12 em agosto, e o pico foi 104 em junho.",
     ],
-    bullets: []
+    bullets: [],
   },
   {
     title: "Perfil das 106 novas famílias",
     paragraphs: [
       "Os perfis B.1 a B.6 identificam condições selecionadas e podem se sobrepor; sua soma não precisa coincidir com as 106 inserções de A.2. Até agosto, foram informadas 16 famílias com membro beneficiário do BPC, 10 beneficiárias do Bolsa Família, 2 em extrema pobreza e 1 com descumprimento de condicionalidades. Em setembro, todos os campos B.1 a B.6 aparecem zerados, embora A.2 registre 3 novas famílias.",
-      "Não há registro de famílias novas com crianças/adolescentes em trabalho infantil ou acolhimento no período. Isso significa ausência de registro nesses campos, não comprovação de inexistência das situações."
+      "Não há registro de famílias novas com crianças/adolescentes em trabalho infantil ou acolhimento no período. Isso significa ausência de registro nesses campos, não comprovação de inexistência das situações.",
     ],
-    bullets: []
+    bullets: [],
   },
   {
     title: "Encaminhamentos e benefícios",
     paragraphs: [
       "No acumulado, foram 130 encaminhamentos ao Cadastro Único (22 para inclusão e 108 para atualização), 15 encaminhamentos para acesso ao BPC e 30 famílias encaminhadas ao CREAS. Setembro concentrou 15 encaminhamentos ao CREAS, frente a 1 em agosto (janeiro teve zero; de fevereiro a julho, foram de 1 a 3 por mês); o salto precisa ser validado.",
-      "Os benefícios eventuais somaram 668 registros: 16 auxílios-natalidade, 35 auxílios-funeral e 617 outros benefícios. Em setembro foram 105 (6, 4 e 95, respectivamente). Os 95 registros em C.9 compõem cerca de 90% dos benefícios eventuais do mês; identificar quais benefícios foram contabilizados e confirmar o critério de registro."
+      "Os benefícios eventuais somaram 668 registros: 16 auxílios-natalidade, 35 auxílios-funeral e 617 outros benefícios. Em setembro foram 105 (6, 4 e 95, respectivamente). Os 95 registros em C.9 compõem cerca de 90% dos benefícios eventuais do mês; identificar quais benefícios foram contabilizados e confirmar o critério de registro.",
     ],
-    bullets: []
+    bullets: [],
   },
   {
     title: "Serviços de convivência e atividades coletivas",
     paragraphs: [
       "A soma dos registros mensais das quatro faixas etárias do SCFV foi de 374 a 408 entre janeiro e junho, caiu para 249 em julho e 103 em agosto, e subiu para 418 em setembro. O salto de setembro decorre, principalmente, de 47 para 183 registros na faixa de 7–14 anos e de 15 para 177 entre idosos. As mudanças podem refletir retomada das atividades, atualização cadastral ou lançamento acumulado; conferir listas de presença, calendário e competência.",
-      "As palestras e oficinas (D.6) acumularam 2.352 participações; foram 477 em setembro, após 31 em agosto, e o pico foi 517 em junho. Os grupos regulares do PAIF tiveram média de 21,6 famílias por mês; setembro registrou 19. O total de participações não deve ser interpretado automaticamente como pessoas únicas."
+      "As palestras e oficinas (D.6) acumularam 2.352 participações; foram 477 em setembro, após 31 em agosto, e o pico foi 517 em junho. Os grupos regulares do PAIF tiveram média de 21,6 famílias por mês; setembro registrou 19. O total de participações não deve ser interpretado automaticamente como pessoas únicas.",
     ],
-    bullets: []
+    bullets: [],
   },
   {
     title: "Públicos que merecem atenção",
@@ -335,11 +159,11 @@ const sections = [
     bullets: [
       "Pessoas idosas no SCFV: 177 registros em setembro, após 15 em agosto e 34 em julho; confirmar se os meses anteriores tiveram suspensão, sub-registro ou mudança na contagem.",
       "Crianças e adolescentes de 7 a 14 anos: 183 registros em setembro, após 47 em agosto; validar retomada e listas nominais de participação.",
-      "Adultos de 18 a 59 anos: D.8 permaneceu zerado de janeiro a setembro; verificar se a atividade não foi ofertada ou se faltou preenchimento.",
+      "Adultos 18–59 anos: D.8 permaneceu zerado de janeiro a setembro; verificar se a atividade não foi ofertada ou se faltou preenchimento.",
       "Pessoas com deficiência: 27 registros em setembro (média mensal 19,7); o campo pode se sobrepor às faixas etárias e não deve ser somado como público exclusivo.",
       "Famílias novas em extrema pobreza: 2 registros entre 106 novas inserções até setembro. Conferir a identificação sem concluir subnotificação apenas pelo percentual.",
-      "Famílias com membro beneficiário do BPC e do Bolsa Família: 16 e 10 registros até agosto, respectivamente; em setembro, ambos os campos foram informados como zero."
-    ]
+      "Famílias com membro beneficiário do BPC e do Bolsa Família: 16 e 10 registros até agosto, respectivamente; em setembro, ambos os campos foram informados como zero.",
+    ],
   },
   {
     title: "Pontos de atenção nos dados",
@@ -351,8 +175,8 @@ const sections = [
       "Benefícios eventuais: setembro informa 95 em ‘outros benefícios’ (C.9), além de 6 de natalidade e 4 de funeral. Discriminar o conteúdo de C.9 e conferir os comprovantes e o padrão dos meses anteriores.",
       "Novas famílias: janeiro registra 47 de 106 inserções (44,3%); setembro, 3. Conferir eventual entrada acumulada e a competência de cada inclusão.",
       "Campos zerados: B.5 (trabalho infantil), B.6 (acolhimento) e D.8 (adultos de 18–59 anos) aparecem sem registros. Confirmar oferta, ocorrência e preenchimento; zero não prova ausência de demanda.",
-      "Planilha de janeiro a agosto: a análise anterior identificou a fórmula =SUM(E3:G3) na célula Q24 junto a ‘atendimentos coletivos’, somando o estoque do PAIF de abril a junho, e não os coletivos. Revisar a referência e criar total compatível com o indicador. Também padronizar o código B.1 e a ordenação D.5/D.8."
-    ]
+      "Planilha de janeiro a agosto: a análise anterior identificou a fórmula =SUM(E3:G3) na célula Q24 junto a ‘atendimentos coletivos’, somando o estoque do PAIF de abril a junho, e não os coletivos. Revisar a referência e criar total compatível com o indicador. Também padronizar o código B.1 e a ordenação D.5/D.8.",
+    ],
   },
   {
     title: "Recomendações para a gestão",
@@ -365,10 +189,12 @@ const sections = [
       "Auditar as 47 novas famílias de janeiro e as 3 de setembro para verificar eventual lançamento acumulado e competência correta.",
       "Confirmar com a equipe os zeros de B.5, B.6 e D.8, distinguindo ‘serviço não ofertado’, ‘nenhuma ocorrência’ e ‘não informado’.",
       "Acompanhar os encaminhamentos ao Cadastro Único: atualização caiu de 26 em março para 3 em agosto e voltou a 12 em setembro.",
-      "Padronizar códigos, ordem dos campos e fórmulas; fazer conferência por dupla checagem antes do envio do RMA."
-    ]
-  }
+      "Padronizar códigos, ordem dos campos e fórmulas; fazer conferência por dupla checagem antes do envio do RMA.",
+    ],
+  },
 ];
+
+// Valores do perfil das novas famílias informados no RMA de setembro.
 const septemberProfile = [
   ["Famílias em situação de extrema pobreza", 0],
   ["Famílias beneficiárias do Programa Bolsa Família", 0],
@@ -378,62 +204,123 @@ const septemberProfile = [
   ["Famílias com criança/adolescente em acolhimento", 0],
 ] as const;
 
+// Totais de encaminhamentos e benefícios acompanhados de notas de validação.
 const referrals = [
   [
     "Atualização do Cadastro Único",
     "108",
-    "Pico de 26 em março; 3 em agosto e 12 em setembro"
+    "Pico de 26 em março; 3 em agosto e 12 em setembro",
   ],
-  [
-    "Inclusão no Cadastro Único",
-    "22",
-    "2 em setembro; nenhuma em abril"
-  ],
+  ["Inclusão no Cadastro Único", "22", "2 em setembro; nenhuma em abril"],
   [
     "Acesso ao BPC",
     "15",
-    "Nenhum em janeiro e maio; zero em setembro"
+    "Nenhum em janeiro e maio; zero em setembro",
   ],
   [
     "Famílias encaminhadas ao CREAS",
     "30",
-    "15 em setembro, ante 1 em agosto; validar o salto"
+    "15 em setembro, ante 1 em agosto; validar o salto",
   ],
-  [
-    "Auxílio-funeral",
-    "35",
-    "Pico de 10 em fevereiro; 4 em setembro"
-  ],
-  [
-    "Auxílio-natalidade",
-    "16",
-    "6 em setembro; 5 em agosto"
-  ],
+  ["Auxílio-funeral", "35", "Pico de 10 em fevereiro; 4 em setembro"],
+  ["Auxílio-natalidade", "16", "6 em setembro; 5 em agosto"],
   [
     "Outros benefícios eventuais",
     "617",
-    "95 em setembro; pico de 129 em junho"
-  ]
+    "95 em setembro; pico de 129 em junho",
+  ],
 ];
 
-const fmt = (value: number) => value.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+// Formata números usando separadores e convenções da língua portuguesa do Brasil.
+const fmt = (value: number) =>
+  value.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+
+// Ícone de seta dos links de navegação.
 function ArrowIcon() {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true"><path d="M5 12h14" strokeLinecap="round" /><path d="m13 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" strokeLinecap="round" />
+      <path
+        d="m13 6 6 6-6 6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
-function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
-  return <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"><h2 className="text-lg font-extrabold text-slate-900">{title}</h2>{subtitle && <p className="mt-1 text-sm leading-6 text-slate-500">{subtitle}</p>}<div className="mt-5 space-y-4">{children}</div></section>;
+
+// Componente visual reutilizável para padronizar os painéis da página.
+function Panel({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 className="text-lg font-extrabold text-slate-900">{title}</h2>
+      {subtitle && (
+        <p className="mt-1 text-sm leading-6 text-slate-500">{subtitle}</p>
+      )}
+      <div className="mt-5 space-y-4">{children}</div>
+    </section>
+  );
 }
+
+// Barra de proporção do perfil das famílias, calculada sobre 106 inclusões.
 function ProfileBar({ label, value }: { label: string; value: number }) {
-  const percent = value / 106 * 100;
-  return <div><div className="mb-2 flex justify-between gap-3 text-sm"><span className="text-slate-600">{label}</span><span className="font-bold text-slate-800">{value} <span className="font-normal text-slate-500">({fmt(percent)}%)</span></span></div><div className="h-2.5 rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-green-700" style={{ width: `${percent}%` }} /></div></div>;
+  const percent = (value / 106) * 100;
+
+  return (
+    <div>
+      <div className="mb-2 flex justify-between gap-3 text-sm">
+        <span className="text-slate-600">{label}</span>
+        <span className="font-bold text-slate-800">
+          {value}{" "}
+          <span className="font-normal text-slate-500">
+            ({fmt(percent)}%)
+          </span>
+        </span>
+      </div>
+      <div className="h-2.5 rounded-full bg-slate-100" aria-hidden="true">
+        <div
+          className="h-full rounded-full bg-green-700"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  );
 }
+
+// Faixas etárias, índices das métricas e cores usadas no gráfico do SCFV.
 const groups = [
   { index: 12, label: "0 a 6 anos", color: "#86bba0", textColor: "#153728" },
   { index: 13, label: "7 a 14 anos", color: "#15803d", textColor: "#ffffff" },
-  { index: 14, label: "15 a 17 anos", color: "#d19a3a", textColor: "#34250b" },
-  { index: 15, label: "Pessoas idosas", color: "#8a6bb5", textColor: "#ffffff" },
+  {
+    index: 14,
+    label: "15 a 17 anos",
+    color: "#d19a3a",
+    textColor: "#34250b",
+  },
+  {
+    index: 15,
+    label: "Pessoas idosas",
+    color: "#8a6bb5",
+    textColor: "#ffffff",
+  },
 ];
 
+// Desenha as participações mensais do SCFV em colunas empilhadas por faixa etária.
 function ScfvChart({ indexes }: { indexes: number[] }) {
   const baseline = 245;
   const scale = 0.38;
@@ -578,66 +465,659 @@ function ScfvChart({ indexes }: { indexes: number[] }) {
   );
 }
 
-export default function RmaCrasConviverCrescerPage() {
-  const [selectedMonth, setSelectedMonth] = useState("all");
-  const indexes = selectedMonth === "all" ? months.map((_,i) => i) : [Number(selectedMonth)];
-  const aggregate = (index: number) => {
-    const metric=metrics[index]; const sum=indexes.reduce((total,i) => total+metric.values[i],0);
-    return metric.kind === "average" ? sum/indexes.length : sum;
-  };
-  const fullPeriod=selectedMonth === "all";
-  const period=fullPeriod ? "Janeiro a setembro de 2026" : `${months[Number(selectedMonth)]} de 2026`;
-  const kpis = [
-    { label: fullPeriod ? "Média de famílias no PAIF" : "Famílias no PAIF", value: aggregate(0), note: "Estoque de famílias em acompanhamento" },
-    { label: "Novas famílias no PAIF", value: aggregate(1), note: "Inserções no período selecionado" },
-    { label: "Atendimentos particularizados", value: aggregate(2), note: "Volume registrado de atendimentos" },
-    { label: "Visitas domiciliares", value: aggregate(3), note: "Volume registrado de visitas" },
-    { label: "Encaminhamentos ao Cadastro Único", value: aggregate(4)+aggregate(5), note: "Inclusão e atualização cadastral" },
-    { label: "Benefícios eventuais concedidos", value: aggregate(8)+aggregate(9)+aggregate(10), note: "Natalidade, funeral e outros benefícios" },
+/**
+ * Gráficos evolutivos de indicadores principais.
+ * Cada indicador tem sua própria escala vertical para facilitar a leitura
+ * sem misturar quantidades de naturezas diferentes.
+ */
+function MainIndicatorLineChart({
+  metric,
+  indexes,
+  color,
+}: {
+  metric: Metric;
+  indexes: number[];
+  color: string;
+}) {
+  // Tamanho do SVG e margens reservadas para eixos, rótulos e meses.
+  const width = 720;
+  const height = 250;
+  const left = 54;
+  const right = 18;
+  const top = 24;
+  const bottom = 42;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+  // Separa apenas os valores dos meses selecionados pelo filtro da página.
+  const values = indexes.map((index) => metric.values[index]);
+  const maxValue = Math.max(...values, 1);
+  const axisMax = Math.ceil(maxValue / 5) * 5 || 5;
+
+  const xForPosition = (position: number) =>
+    indexes.length === 1
+      ? left + chartWidth / 2
+      : left + (position / (indexes.length - 1)) * chartWidth;
+
+  const yForValue = (value: number) =>
+    top + chartHeight - (value / axisMax) * chartHeight;
+
+  // Converte valores em coordenadas para desenhar pontos e linhas no SVG.
+  const points = values.map((value, position) => ({
+    x: xForPosition(position),
+    y: yForValue(value),
+    value,
+    monthIndex: indexes[position],
+  }));
+
+  // Constrói o caminho SVG que conecta os pontos em ordem cronológica.
+  const linePath = points
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`,
+    )
+    .join(" ");
+
+  const ticks = [0, axisMax / 2, axisMax];
+  const chartId = metric.label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+
+  return (
+    <article className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+      <div className="mb-3 flex items-start gap-3">
+        <span
+          className="mt-1 h-3 w-3 shrink-0 rounded-full"
+          style={{ backgroundColor: color }}
+          aria-hidden="true"
+        />
+        <div>
+          <h4 className="text-sm font-bold leading-5 text-slate-800">
+            {metric.label}
+          </h4>
+          <p className="mt-1 text-xs text-slate-500">
+            Evolução mensal · valores registrados
+          </p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-labelledby={`${chartId}-title ${chartId}-description`}
+          className="min-w-[560px] w-full"
+        >
+          <title id={`${chartId}-title`}>
+            Evolução mensal: {metric.label}
+          </title>
+          <desc id={`${chartId}-description`}>
+            {points
+              .map(
+                (point) =>
+                  `${months[point.monthIndex]}: ${fmt(point.value)}`,
+              )
+              .join("; ")}
+          </desc>
+
+          {ticks.map((tick) => {
+            const y = yForValue(tick);
+
+            return (
+              <g key={tick}>
+                <line
+                  x1={left}
+                  x2={width - right}
+                  y1={y}
+                  y2={y}
+                  stroke="#e2e8f0"
+                  strokeDasharray={tick === 0 ? undefined : "4 4"}
+                />
+                <text
+                  x={left - 10}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize="11"
+                  fill="#64748b"
+                >
+                  {fmt(tick)}
+                </text>
+              </g>
+            );
+          })}
+
+          {points.length > 1 && (
+            <path
+              d={linePath}
+              fill="none"
+              stroke={color}
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+
+          {points.map((point) => (
+            <g key={point.monthIndex}>
+              {points.length === 1 && (
+                <line
+                  x1={left}
+                  x2={width - right}
+                  y1={point.y}
+                  y2={point.y}
+                  stroke={color}
+                  strokeWidth="2"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+              )}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r="5"
+                fill="white"
+                stroke={color}
+                strokeWidth="3"
+              >
+                <title>
+                  {months[point.monthIndex]}: {fmt(point.value)}
+                </title>
+              </circle>
+              <text
+                x={point.x}
+                y={Math.max(top + 12, point.y - 11)}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="700"
+                fill="#334155"
+              >
+                {fmt(point.value)}
+              </text>
+              <text
+                x={point.x}
+                y={height - 12}
+                textAnchor="middle"
+                fontSize="11"
+                fill="#64748b"
+              >
+                {months[point.monthIndex]}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </article>
+  );
+}
+
+// Agrupa os quatro gráficos de linha dos indicadores principais.
+function MainIndicatorsChart({ indexes }: { indexes: number[] }) {
+  const charts = [
+    { metric: metrics[0], color: "#15803d" },
+    { metric: metrics[1], color: "#d19a3a" },
+    { metric: metrics[2], color: "#0f766e" },
+    { metric: metrics[3], color: "#8a6bb5" },
   ];
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {charts.map(({ metric, color }) => (
+        <MainIndicatorLineChart
+          key={metric.label}
+          metric={metric}
+          indexes={indexes}
+          color={color}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Mostra a evolução dos benefícios eventuais em gráficos de linhas.
+ * Cada série usa escala própria para que as categorias com números menores
+ * também fiquem legíveis. A tabela abaixo preserva a comparação numérica exata.
+ */
+function BenefitsEvolutionChart({ indexes }: { indexes: number[] }) {
+  // As categorias apontam para seus respectivos índices no vetor `metrics`.
+  const benefitMetrics = [
+    { metric: metrics[8], color: "#15803d" },
+    { metric: metrics[9], color: "#d19a3a" },
+    { metric: metrics[10], color: "#3478a5" },
+  ];
+
+  // Soma as três categorias mês a mês para criar também a série total.
+  const totalBenefitMetric: Metric = {
+    label: "Total de benefícios eventuais",
+    values: months.map((_, monthIndex) =>
+      benefitMetrics.reduce(
+        (total, item) => total + item.metric.values[monthIndex],
+        0,
+      ),
+    ),
+    kind: "sum",
+  };
+
+  // Junta o total e as categorias individuais; a ordem define a exibição.
+  const charts = [
+    { metric: totalBenefitMetric, color: "#0f766e" },
+    ...benefitMetrics,
+  ];
+
+  // Calcula o total acumulado no intervalo atual, respeitando o filtro mensal.
+  const periodTotal = indexes.reduce(
+    (total, monthIndex) => total + totalBenefitMetric.values[monthIndex],
+    0,
+  );
+
+  return (
+    <div className="border-t border-slate-200 pt-5">
+      {/* Título e período coberto pelas informações disponíveis. */}
+      <div className="mb-4">
+        <h3 className="text-base font-extrabold text-slate-900">
+          Evolução dos benefícios eventuais
+        </h3>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Séries mensais de janeiro a setembro de 2026. Outubro a dezembro
+          não constam nos dados recebidos.
+        </p>
+      </div>
+
+      {/* Um gráfico para o total e um para cada tipo de benefício. */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {charts.map(({ metric, color }) => (
+          <MainIndicatorLineChart
+            key={metric.label}
+            metric={metric}
+            indexes={indexes}
+            color={color}
+          />
+        ))}
+      </div>
+
+      {/* Tabela com valores exatos, que complementa a leitura visual das linhas. */}
+      <div className="mt-5 overflow-x-auto">
+        <table className="w-full min-w-[680px] border-collapse text-xs">
+          <caption className="sr-only">
+            Benefícios eventuais por mês e total do período selecionado
+          </caption>
+          <thead className="bg-slate-50 text-slate-500">
+            <tr>
+              <th scope="col" className="px-3 py-2.5 text-left">
+                Benefício
+              </th>
+              {indexes.map((monthIndex) => (
+                <th
+                  key={monthIndex}
+                  scope="col"
+                  className="px-3 py-2.5 text-right"
+                >
+                  {months[monthIndex]}
+                </th>
+              ))}
+              <th
+                scope="col"
+                className="whitespace-nowrap px-3 py-2.5 text-right"
+              >
+                Total do período
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {benefitMetrics.map(({ metric }) => {
+              // Totaliza apenas os meses atualmente selecionados.
+              const total = indexes.reduce(
+                (sum, monthIndex) => sum + metric.values[monthIndex],
+                0,
+              );
+
+              return (
+                <tr
+                  key={metric.label}
+                  className="border-b border-slate-100 even:bg-slate-50"
+                >
+                  <th
+                    scope="row"
+                    className="whitespace-nowrap px-3 py-2.5 text-left font-semibold text-slate-700"
+                  >
+                    {metric.label}
+                  </th>
+                  {indexes.map((monthIndex) => (
+                    <td
+                      key={monthIndex}
+                      className="px-3 py-2.5 text-right tabular-nums text-slate-600"
+                    >
+                      {fmt(metric.values[monthIndex])}
+                    </td>
+                  ))}
+                  <td className="bg-green-50 px-3 py-2.5 text-right font-bold tabular-nums text-green-800">
+                    {fmt(total)}
+                  </td>
+                </tr>
+              );
+            })}
+
+            {/* Linha final consolida todas as categorias em cada mês. */}
+            <tr className="bg-green-50/70">
+              <th
+                scope="row"
+                className="px-3 py-2.5 text-left font-extrabold text-slate-800"
+              >
+                Total mensal
+              </th>
+              {indexes.map((monthIndex) => (
+                <td
+                  key={monthIndex}
+                  className="px-3 py-2.5 text-right font-bold tabular-nums text-slate-800"
+                >
+                  {fmt(totalBenefitMetric.values[monthIndex])}
+                </td>
+              ))}
+              <td className="px-3 py-2.5 text-right font-black tabular-nums text-green-800">
+                {fmt(periodTotal)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="mt-3 text-xs leading-5 text-slate-500">
+        Cada gráfico usa uma escala vertical própria para tornar visível a
+        variação de cada categoria. Os valores exatos estão na tabela e seguem
+        o filtro de período da página.
+      </p>
+    </div>
+  );
+}
+
+// Componente principal: mantém o filtro mensal e compõe todos os painéis do relatório.
+export default function RmaCrasConviverCrescerPage() {
+  // "all" indica que todos os meses disponíveis estão selecionados.
+  const [selectedMonth, setSelectedMonth] = useState("all");
+
+  const indexes =
+    selectedMonth === "all"
+      ? months.map((_, index) => index)
+      : [Number(selectedMonth)];
+
+  // Agrega uma métrica no período; indicadores de estoque usam média mensal.
+  const aggregate = (index: number) => {
+    const metric = metrics[index];
+    const sum = indexes.reduce(
+      (total, monthIndex) => total + metric.values[monthIndex],
+      0,
+    );
+
+    return metric.kind === "average" ? sum / indexes.length : sum;
+  };
+
+  // Define rótulos de período e cartões de acordo com o filtro selecionado.
+  const fullPeriod = selectedMonth === "all";
+  const period = fullPeriod
+    ? "Janeiro a setembro de 2026"
+    : `${months[Number(selectedMonth)]} de 2026`;
+
+  // Cartões de resumo exibidos antes da tabela detalhada.
+  const kpis = [
+    {
+      label: fullPeriod ? "Média de famílias no PAIF" : "Famílias no PAIF",
+      value: aggregate(0),
+      note: "Estoque de famílias em acompanhamento",
+    },
+    {
+      label: "Novas famílias no PAIF",
+      value: aggregate(1),
+      note: "Inserções no período selecionado",
+    },
+    {
+      label: "Atendimentos particularizados",
+      value: aggregate(2),
+      note: "Volume registrado de atendimentos",
+    },
+    {
+      label: "Visitas domiciliares",
+      value: aggregate(3),
+      note: "Volume registrado de visitas",
+    },
+    {
+      label: "Encaminhamentos ao Cadastro Único",
+      value: aggregate(4) + aggregate(5),
+      note: "Inclusão e atualização cadastral",
+    },
+    {
+      label: "Benefícios eventuais concedidos",
+      value: aggregate(8) + aggregate(9) + aggregate(10),
+      note: "Natalidade, funeral e outros benefícios",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-50">
+      {/* Identificação institucional e atalhos de navegação. */}
       <header className="border-b border-white/10 bg-[#102b27] text-white print:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-5 lg:px-8">
-          <Link href="/" aria-label="Página inicial" className="flex min-w-0 items-center">
-            <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-36"><Image src="/log.png" alt="Prefeitura de Santa Izabel do Pará" width={200} height={110} className="h-full w-full object-contain" priority /></div>
+          <Link
+            href="/"
+            aria-label="Página inicial"
+            className="flex min-w-0 items-center"
+          >
+            <div className="flex h-14 w-32 shrink-0 items-center rounded-xl bg-white px-2 sm:h-16 sm:w-36">
+              <Image
+                src="/log.png"
+                alt="Prefeitura de Santa Izabel do Pará"
+                width={200}
+                height={110}
+                className="h-full w-full object-contain"
+                priority
+              />
+            </div>
             <div className="mx-4 hidden h-10 w-px bg-white/20 sm:block md:mx-5" />
-            <div className="hidden min-w-0 sm:block"><p className="text-xs font-semibold leading-tight text-emerald-100/75">Secretaria Municipal de Trabalho</p><p className="mt-1 text-sm font-extrabold leading-tight text-white">e Promoção Social <span className="font-medium text-emerald-100/75">/ SEMTEPS</span></p><p className="mt-1 text-xs text-emerald-100/65">Plataforma da Vigilância Socioassistencial</p></div>
+            <div className="hidden min-w-0 sm:block">
+              <p className="text-xs font-semibold leading-tight text-emerald-100/75">
+                Secretaria Municipal de Trabalho
+              </p>
+              <p className="mt-1 text-sm font-extrabold leading-tight text-white">
+                e Promoção Social{" "}
+                <span className="font-medium text-emerald-100/75">
+                  / SEMTEPS
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-emerald-100/65">
+                Plataforma da Vigilância Socioassistencial
+              </p>
+            </div>
           </Link>
-          <nav aria-label="Navegação principal" className="flex flex-col items-end gap-2">
-            <Link href="/" className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]">
-              Início<ArrowIcon />
+
+          <nav
+            aria-label="Navegação principal"
+            className="flex flex-col items-end gap-2"
+          >
+            <Link
+              href="/"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              Início
+              <ArrowIcon />
             </Link>
-            <Link href="/painel/psb" className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]">
-              Voltar<span className="rotate-180"><ArrowIcon /></span>
+            <Link
+              href="/painel/psb"
+              className="inline-flex h-9 w-24 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-transparent px-2 text-xs font-semibold text-white transition hover:border-lime-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#102b27]"
+            >
+              Voltar
+              <span className="rotate-180">
+                <ArrowIcon />
+              </span>
             </Link>
           </nav>
         </div>
-        <div className="border-t border-white/10 px-6 py-4 sm:hidden"><p className="text-sm font-extrabold leading-tight text-white">Secretaria Municipal de Trabalho<span className="block">e Promoção Social - SEMTEPS</span></p><p className="mt-1 text-xs text-emerald-100/65">Plataforma da Vigilância Socioassistencial</p></div>
+
+        <div className="border-t border-white/10 px-6 py-4 sm:hidden">
+          <p className="text-sm font-extrabold leading-tight text-white">
+            Secretaria Municipal de Trabalho
+            <span className="block">e Promoção Social - SEMTEPS</span>
+          </p>
+          <p className="mt-1 text-xs text-emerald-100/65">
+            Plataforma da Vigilância Socioassistencial
+          </p>
+        </div>
       </header>
 
-
+      {/* Área principal: filtro, síntese, tabela, gráficos e análises. */}
       <div className="mx-auto max-w-7xl space-y-6 px-6 py-8 lg:px-8 lg:py-10">
         <div className="flex flex-wrap items-start justify-between gap-5">
-          <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-green-700">Vigilância Socioassistencial</p><h1 className="mt-1 text-3xl font-black tracking-tight text-slate-900">Análise do RMA do CRAS Conviver e Crescer</h1><p className="mt-2 text-sm leading-6 text-slate-500">Área urbana · PAIF e Serviços de Convivência · 2026</p></div>
-          <button type="button" onClick={() => window.print()} className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-600 print:hidden">Imprimir / salvar PDF</button>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-green-700">
+              Vigilância Socioassistencial
+            </p>
+            <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-900">
+              Análise do RMA do CRAS Conviver e Crescer
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Área urbana · PAIF e Serviços de Convivência · 2026
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-600 print:hidden"
+          >
+            Imprimir / salvar PDF
+          </button>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div><span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">{period}</span><p className="mt-2 text-xs text-slate-500">Dados estáticos do relatório anexado. Setembro incluído com base no RMA gerado em 14/10/2026. Outubro a dezembro ainda sem consolidação.</p></div><div className="flex items-center gap-3 print:hidden"><label htmlFor="month" className="text-sm font-semibold text-slate-600">Período</label><select id="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-green-600" style={{ color: "#000000", backgroundColor: "#ffffff", colorScheme: "light" }}><option value="all" style={{ color: "#000000", backgroundColor: "#ffffff" }}>Janeiro a setembro</option>{months.map((month,i) => <option key={month} value={i} style={{ color: "#000000", backgroundColor: "#ffffff" }}>{month} / 2026</option>)}</select></div></div>
-        <p className="text-sm text-slate-600">O filtro atualiza os indicadores, a tabela e o gráfico. A análise geral, os perfis e as recomendações abrangem janeiro a setembro.</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{kpis.map(k => <div key={k.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-xs font-semibold text-slate-500">{k.label}</p><p className="mt-3 text-3xl font-black text-green-700">{fmt(k.value)}</p><p className="mt-2 text-xs leading-5 text-slate-500">{k.note}</p></div>)}</div>
-        <Panel title="Leitura geral do período" subtitle="Janeiro a setembro de 2026"><p className="text-sm leading-7 text-slate-600">De janeiro a setembro, o CRAS registrou média de 150,7 famílias acompanhadas pelo PAIF, 106 novas inserções, 3.630 atendimentos particularizados e 555 visitas. Setembro se destaca pela alta do estoque para 189, 517 atendimentos, 81 visitas, 15 encaminhamentos ao CREAS e 95 outros benefícios eventuais. Também houve recuperação dos registros do SCFV após valores baixos em julho e agosto. As variações precisam ser validadas com os registros de origem.</p><div className="grid gap-4 sm:grid-cols-3">{[["189","famílias acompanhadas em setembro"],["2.352","participações em palestras e oficinas"],["30","encaminhamentos ao CREAS no período"]].map(([value,label]) => <div key={label} className="rounded-lg bg-slate-50 p-4"><p className="text-xl font-extrabold text-slate-800">{value}</p><p className="mt-1 text-xs leading-5 text-slate-500">{label}</p></div>)}</div></Panel>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div>
+            <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">
+              {period}
+            </span>
+            <p className="mt-2 text-xs text-slate-500">
+              Dados estáticos do relatório anexado. Setembro incluído com base
+              no RMA gerado em 14/10/2026. Outubro a dezembro ainda sem
+              consolidação.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 print:hidden">
+            <label
+              htmlFor="month"
+              className="text-sm font-semibold text-slate-600"
+            >
+              Período
+            </label>
+            <select
+              id="month"
+              value={selectedMonth}
+              onChange={(event) => setSelectedMonth(event.target.value)}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-green-600"
+              style={{
+                color: "#000000",
+                backgroundColor: "#ffffff",
+                colorScheme: "light",
+              }}
+            >
+              <option
+                value="all"
+                style={{ color: "#000000", backgroundColor: "#ffffff" }}
+              >
+                Janeiro a setembro
+              </option>
+              {months.map((month, index) => (
+                <option
+                  key={month}
+                  value={index}
+                  style={{ color: "#000000", backgroundColor: "#ffffff" }}
+                >
+                  {month} / 2026
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <p className="text-sm text-slate-600">
+          O filtro atualiza os indicadores, a tabela e os gráficos. A análise
+          geral, os perfis e as recomendações abrangem janeiro a setembro.
+        </p>
+
+        {/* Indicadores destacados em cartões responsivos. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {kpis.map((kpi) => (
+            <div
+              key={kpi.label}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
+              <p className="text-xs font-semibold text-slate-500">
+                {kpi.label}
+              </p>
+              <p className="mt-3 text-3xl font-black text-green-700">
+                {fmt(kpi.value)}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                {kpi.note}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Síntese gerencial do período e principais destaques numéricos. */}
+        <Panel
+          title="Leitura geral do período"
+          subtitle="Janeiro a setembro de 2026"
+        >
+          <p className="text-sm leading-7 text-slate-600">
+            De janeiro a setembro, o CRAS registrou média de 150,7 famílias
+            acompanhadas pelo PAIF, 106 novas inserções, 3.630 atendimentos
+            particularizados e 555 visitas. Setembro se destaca pela alta do
+            estoque para 189, 517 atendimentos, 81 visitas, 15 encaminhamentos
+            ao CREAS e 95 outros benefícios eventuais. Também houve recuperação
+            dos registros do SCFV após valores baixos em julho e agosto. As
+            variações precisam ser validadas com os registros de origem.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              ["189", "famílias acompanhadas em setembro"],
+              ["2.352", "participações em palestras e oficinas"],
+              ["30", "encaminhamentos ao CREAS no período"],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-lg bg-slate-50 p-4">
+                <p className="text-xl font-extrabold text-slate-800">{value}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{label}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        {/* Tabela completa; os gráficos ficam logo abaixo dela. */}
         <Panel title="Índices mensais" subtitle={period}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] border-collapse text-sm">
-              <caption className="sr-only">Indicadores do CRAS Conviver e Crescer</caption>
+              <caption className="sr-only">
+                Indicadores do CRAS Conviver e Crescer
+              </caption>
               <thead className="bg-slate-50 text-slate-500">
                 <tr>
-                  <th scope="col" className="px-3 py-3 text-left">Indicador</th>
+                  <th scope="col" className="px-3 py-3 text-left">
+                    Indicador
+                  </th>
                   {indexes.map((index) => (
-                    <th key={index} scope="col" className="px-3 py-3 text-right">{months[index]}</th>
+                    <th
+                      key={index}
+                      scope="col"
+                      className="px-3 py-3 text-right"
+                    >
+                      {months[index]}
+                    </th>
                   ))}
-                  <th scope="col" className="whitespace-nowrap px-3 py-3 text-right">Total do período</th>
-                  <th scope="col" className="whitespace-nowrap px-3 py-3 text-right">Média mensal</th>
+                  <th
+                    scope="col"
+                    className="whitespace-nowrap px-3 py-3 text-right"
+                  >
+                    Total do período
+                  </th>
+                  <th
+                    scope="col"
+                    className="whitespace-nowrap px-3 py-3 text-right"
+                  >
+                    Média mensal
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -649,46 +1129,223 @@ export default function RmaCrasConviverCrescerPage() {
                   const average = total / indexes.length;
 
                   return (
-                    <tr key={metric.label} className="border-b border-slate-100 even:bg-slate-50">
-                      <th scope="row" className="min-w-[220px] px-3 py-3 text-left font-semibold text-slate-700">{metric.label}</th>
+                    <tr
+                      key={metric.label}
+                      className="border-b border-slate-100 even:bg-slate-50"
+                    >
+                      <th
+                        scope="row"
+                        className="min-w-[220px] px-3 py-3 text-left font-semibold text-slate-700"
+                      >
+                        {metric.label}
+                      </th>
                       {indexes.map((monthIndex) => (
-                        <td key={monthIndex} className="px-3 py-3 text-right tabular-nums text-slate-600">{fmt(metric.values[monthIndex])}</td>
+                        <td
+                          key={monthIndex}
+                          className="px-3 py-3 text-right tabular-nums text-slate-600"
+                        >
+                          {fmt(metric.values[monthIndex])}
+                        </td>
                       ))}
-                      <td className="whitespace-nowrap bg-green-50 px-3 py-3 text-right font-bold text-green-800">{fmt(total)}</td>
-                      <td className="whitespace-nowrap bg-green-50 px-3 py-3 text-right font-bold text-green-800">{fmt(average)}</td>
+                      <td className="whitespace-nowrap bg-green-50 px-3 py-3 text-right font-bold text-green-800">
+                        {fmt(total)}
+                      </td>
+                      <td className="whitespace-nowrap bg-green-50 px-3 py-3 text-right font-bold text-green-800">
+                        {fmt(average)}
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
+
           <p className="text-xs leading-6 text-slate-500">
-            Total do período = soma dos meses selecionados. Média mensal = total dividido pela quantidade de meses selecionados. Para indicadores de estoque e participação recorrente, o total representa a soma dos registros mensais, e não famílias ou pessoas únicas. Participações em oficinas podem incluir uma pessoa em mais de uma atividade.
+            Total do período = soma dos meses selecionados. Média mensal = total
+            dividido pela quantidade de meses selecionados. Para indicadores de
+            estoque e participação recorrente, o total representa a soma dos
+            registros mensais, e não famílias ou pessoas únicas. Participações
+            em oficinas podem incluir uma pessoa em mais de uma atividade.
           </p>
-        </Panel>
-        {sections.map(section => <Panel key={section.title} title={section.title} subtitle="Janeiro a setembro de 2026">
-          {section.title === "Perfil das 106 novas famílias" && (
-            <div className="space-y-4">
-              {[{label:"Com membro beneficiário do BPC",value:16},{label:"Beneficiárias do Bolsa Família",value:10},{label:"Em extrema pobreza",value:2},{label:"PBF em descumprimento",value:1}].map(item => <ProfileBar key={item.label} {...item} />)}
-              <p className="text-xs leading-6 text-slate-500">Proporções sobre 106 novas famílias até setembro. Categorias podem se sobrepor.</p>
-              <div className="rounded-lg border border-green-100 bg-green-50/60 p-4">
-                <h3 className="text-sm font-bold text-slate-800">Perfil das 3 novas famílias inseridas em setembro</h3>
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full min-w-[480px] text-sm">
-                    <thead><tr className="border-b border-green-100 text-slate-600"><th scope="col" className="py-2 text-left font-semibold">Campo do RMA (B.1 a B.6)</th><th scope="col" className="py-2 text-right font-semibold">Setembro</th></tr></thead>
-                    <tbody>{septemberProfile.map(([label, value]) => <tr key={label} className="border-b border-green-100/70 last:border-0"><th scope="row" className="py-2 text-left font-medium text-slate-700">{label}</th><td className="py-2 text-right font-bold tabular-nums text-slate-900">{value}</td></tr>)}</tbody>
-                  </table>
-                </div>
-                <p className="mt-2 text-xs leading-5 text-slate-500">O RMA informa 3 novas famílias em A.2, mas os campos de perfil B.1 a B.6 estão zerados em setembro. As categorias podem se sobrepor e não precisam somar o valor de A.2.</p>
-              </div>
+
+          {/* Gráficos evolutivos adicionados abaixo da tabela */}
+          <div className="border-t border-slate-200 pt-5">
+            <div className="mb-4">
+              <h3 className="text-base font-extrabold text-slate-900">
+                Evolução mensal dos principais indicadores
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                Cada gráfico usa sua própria escala vertical. Os valores
+                mostrados junto aos pontos são os registros do mês.
+              </p>
             </div>
-          )}
-          {section.title === "Encaminhamentos e benefícios" && <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm"><thead className="bg-slate-50"><tr><th scope="col" className="px-3 py-3 text-left">Item</th><th scope="col" className="px-3 py-3 text-right">Total</th><th scope="col" className="px-3 py-3 text-left">Observação</th></tr></thead><tbody>{referrals.map(([label,total,note]) => <tr key={label} className="border-b border-slate-100 even:bg-slate-50"><th scope="row" className="px-3 py-3 text-left font-semibold text-slate-700">{label}</th><td className="px-3 py-3 text-right font-bold text-green-700">{total}</td><td className="px-3 py-3 text-slate-500">{note}</td></tr>)}</tbody></table></div>}
-          {section.title === "Serviços de convivência e atividades coletivas" && <ScfvChart indexes={indexes} />}
-          {section.paragraphs.map(text => <p key={text} className="text-sm leading-7 text-slate-600">{text}</p>)}
-          {section.bullets.length > 0 && <ul className="list-disc space-y-3 pl-5 text-sm leading-7 text-slate-600">{section.bullets.map(text => <li key={text} className="pl-1">{text}</li>)}</ul>}
-        </Panel>)}
-        <footer className="border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500"><p>Fontes: análise dos dados de janeiro a agosto no código fornecido e RMA do CRAS de setembro/2026, gerado em 14/10/2026. Totais e médias recalculados com os valores mensais.</p><p className="mt-2">Indicadores descrevem registros do serviço, não cobertura populacional ou número de usuários únicos. Esta página não envia informações ao sistema oficial do RMA.</p><p className="mt-3 font-semibold">SEMTEPS · Prefeitura de Santa Izabel do Pará</p></footer>
+            {/* Gráficos originais dos quatro indicadores principais, preservados. */}
+            <MainIndicatorsChart indexes={indexes} />
+            <div className="mt-5">
+              {/* Gráficos de linhas e tabela dos benefícios eventuais. */}
+              <BenefitsEvolutionChart indexes={indexes} />
+            </div>
+          </div>
+        </Panel>
+
+        {/* Painéis com perfis, encaminhamentos, SCFV e recomendações. */}
+        {sections.map((section) => (
+          <Panel
+            key={section.title}
+            title={section.title}
+            subtitle="Janeiro a setembro de 2026"
+          >
+            {section.title === "Perfil das 106 novas famílias" && (
+              <div className="space-y-4">
+                {[
+                  {
+                    label: "Com membro beneficiário do BPC",
+                    value: 16,
+                  },
+                  {
+                    label: "Beneficiárias do Bolsa Família",
+                    value: 10,
+                  },
+                  {
+                    label: "Em extrema pobreza",
+                    value: 2,
+                  },
+                  {
+                    label: "PBF em descumprimento",
+                    value: 1,
+                  },
+                ].map((item) => (
+                  <ProfileBar key={item.label} {...item} />
+                ))}
+
+                <p className="text-xs leading-6 text-slate-500">
+                  Proporções sobre 106 novas famílias até setembro. Categorias
+                  podem se sobrepor.
+                </p>
+
+                <div className="rounded-lg border border-green-100 bg-green-50/60 p-4">
+                  <h3 className="text-sm font-bold text-slate-800">
+                    Perfil das 3 novas famílias inseridas em setembro
+                  </h3>
+                  <div className="mt-3 overflow-x-auto">
+                    <table className="w-full min-w-[480px] text-sm">
+                      <thead>
+                        <tr className="border-b border-green-100 text-slate-600">
+                          <th scope="col" className="py-2 text-left font-semibold">
+                            Campo do RMA (B.1 a B.6)
+                          </th>
+                          <th scope="col" className="py-2 text-right font-semibold">
+                            Setembro
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {septemberProfile.map(([label, value]) => (
+                          <tr
+                            key={label}
+                            className="border-b border-green-100/70 last:border-0"
+                          >
+                            <th
+                              scope="row"
+                              className="py-2 text-left font-medium text-slate-700"
+                            >
+                              {label}
+                            </th>
+                            <td className="py-2 text-right font-bold tabular-nums text-slate-900">
+                              {value}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                    O RMA informa 3 novas famílias em A.2, mas os campos de
+                    perfil B.1 a B.6 estão zerados em setembro. As categorias
+                    podem se sobrepor e não precisam somar o valor de A.2.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {section.title === "Encaminhamentos e benefícios" && (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px] text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th scope="col" className="px-3 py-3 text-left">
+                        Item
+                      </th>
+                      <th scope="col" className="px-3 py-3 text-right">
+                        Total
+                      </th>
+                      <th scope="col" className="px-3 py-3 text-left">
+                        Observação
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {referrals.map(([label, total, note]) => (
+                      <tr
+                        key={label}
+                        className="border-b border-slate-100 even:bg-slate-50"
+                      >
+                        <th
+                          scope="row"
+                          className="px-3 py-3 text-left font-semibold text-slate-700"
+                        >
+                          {label}
+                        </th>
+                        <td className="px-3 py-3 text-right font-bold text-green-700">
+                          {total}
+                        </td>
+                        <td className="px-3 py-3 text-slate-500">{note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {section.title ===
+              "Serviços de convivência e atividades coletivas" && (
+              <ScfvChart indexes={indexes} />
+            )}
+
+            {section.paragraphs.map((text) => (
+              <p key={text} className="text-sm leading-7 text-slate-600">
+                {text}
+              </p>
+            ))}
+
+            {section.bullets.length > 0 && (
+              <ul className="list-disc space-y-3 pl-5 text-sm leading-7 text-slate-600">
+                {section.bullets.map((text) => (
+                  <li key={text} className="pl-1">
+                    {text}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+        ))}
+
+        {/* Fontes dos dados, limites de interpretação e identificação institucional. */}
+        <footer className="border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500">
+          <p>
+            Fontes: análise dos dados de janeiro a agosto no código fornecido e
+            RMA do CRAS de setembro/2026, gerado em 14/10/2026. Totais e médias
+            recalculados com os valores mensais.
+          </p>
+          <p className="mt-2">
+            Indicadores descrevem registros do serviço, não cobertura
+            populacional ou número de usuários únicos. Esta página não envia
+            informações ao sistema oficial do RMA.
+          </p>
+          <p className="mt-3 font-semibold">
+            SEMTEPS · Prefeitura de Santa Izabel do Pará
+          </p>
+        </footer>
       </div>
     </main>
   );
