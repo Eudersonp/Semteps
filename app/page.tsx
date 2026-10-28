@@ -115,7 +115,7 @@ const services: Service[] = [
     analysisLinks: [
       {
         label: "Acessar mapa do município",
-        href: "/mapa-municipio",
+        href: "rma/mapa", // Mantém o mesmo destino do cartão anterior, sem alterar a rota.
       },
     ],
   },
