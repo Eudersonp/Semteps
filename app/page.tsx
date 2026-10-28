@@ -74,7 +74,7 @@ const services: Service[] = [
     analysisLinks: [
       {
         label: "Acessar dados do Conselho Tutelar",
-        href: "/conselho-tutelar",
+        href: "rma/conselho-tutelar",
       },
     ],
   },
